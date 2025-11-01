@@ -35,8 +35,14 @@ main {
     color: white;
     font-family: 'Unbounded', sans-serif;
     /* ANIMAZIONE */
-    opacity: 0;
     margin-top: -50px;
+    opacity: 0;
+    transition: 500ms;
+}
+
+.loading {
+    margin-top: 0px;
+    opacity: 1;
     transition: 500ms;
 }
 

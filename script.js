@@ -39,7 +39,10 @@ window.onload = async function() {
 
         document.title = `${userData.global_name} (@${userData.username})`
 
-        $("main").style.opacity = "1";
         $("main").style.marginTop = "unset";
+        $("main").style.opacity = "1";
+
+        $(".loading").style.marginTop = "200px";
+        $(".loading").style.opacity = "0";
     }
 }
