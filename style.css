@@ -34,6 +34,10 @@ main {
     border-radius: 15px;
     color: white;
     font-family: 'Unbounded', sans-serif;
+    /* ANIMAZIONE */
+    opacity: 0;
+    margin-top: -50px;
+    transition: 500ms;
 }
 
 .logo {
@@ -42,6 +46,21 @@ main {
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
+.avatarDecoration {
+    position: absolute;
+    width: 120px;
+    margin-top: 2px;
+}
+
+.avatarDecoration[src=""] {
+    display: none;
+}
+
 h1 {
-    margin: 10px 0;
+    margin: 5px 0;
+}
+
+h4 {
+    margin: unset;
+    opacity: 0.6;
 }
