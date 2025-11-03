@@ -44,5 +44,9 @@ window.onload = async function() {
 
         $(".loading").style.marginTop = "200px";
         $(".loading").style.opacity = "0";
+
+        $("#apriProfilo").onclick = function() {
+            window.open(`https://discord.com/users/${discordId}`);
+        };
     }
 }
