@@ -135,3 +135,26 @@ button:hover {
     border: 1px solid rgba(255, 255, 255, 0.5);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
 }
+
+.githubLink {
+    display: flex;
+    position: absolute;
+    background-color: rgb(192, 192, 192);
+    right: 10px;
+    bottom: 10px;
+    border-radius: 50px;
+    font-family: 'Unbounded', sans-serif;
+    align-items: center;
+    cursor: pointer;
+}
+
+.githubLink i {
+    --grandezzaIcona: 28px;
+
+    display: flex;
+    background-color: white;
+    padding: 6px;
+    font-size: var(--grandezzaIcona);
+    width: var(--grandezzaIcona);
+    border-radius: 50px;
+}

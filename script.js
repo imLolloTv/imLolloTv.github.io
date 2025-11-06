@@ -43,13 +43,6 @@ function calculateFlags(flagNumber, flags) {
 }
 
 window.onload = async function() {
-    const path = window.location.pathname;
-    const lastPart = path.split('/').filter(Boolean).pop();
-
-    if (/^\d{10,}$/.test(lastPart)) {
-        userId = lastPart;
-    };
-
     const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
 
     const __userFlags = await fetch(`https://flags.lewisakura.moe/flags/user.json`);
@@ -84,7 +77,7 @@ window.onload = async function() {
         }
 
         $(".logo").src = immagine;
-        $(".avatarDecoration").src = avatarDecoration;
+        $(".avatarDecoration").src = avatarDecoration || "";
 
         $("h1").innerHTML = userData.global_name;
         $("h4").innerHTML = userData.username;
@@ -115,5 +108,9 @@ window.onload = async function() {
         $("#apriProfilo").onclick = function() {
             window.open(`https://discord.com/users/${discordId}`);
         };
-    }
+    };
+
+    $(".githubLink").onclick = function() {
+        window.open("https://github.com/imLolloTv/imLolloTv.github.io");
+    };
 }
