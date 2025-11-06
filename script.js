@@ -1,14 +1,66 @@
 const $ = (sel, root = document) => root.querySelector(sel);
 
-const userId = "623496189056253953";
+let userId = "623496189056253953";
+const validFlags = [
+    {
+        id: "HYPESQUAD_ONLINE_HOUSE_1",
+        img: "https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/hypesquadbravery.svg",
+        label: "Hypesquad Bravery"
+    },
+    {
+        id: "HYPESQUAD_ONLINE_HOUSE_2",
+        img: "https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/hypesquadbrilliance.svg",
+        label: "Hypesquad Brilliance"
+    },
+    {
+        id: "HYPESQUAD_ONLINE_HOUSE_3",
+        img: "https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/hypesquadbalance.svg",
+        label: "Hypesquad Balance"
+    },
+    {
+        id: "ACTIVE_DEVELOPER",
+        img: "https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/activedeveloper.svg",
+        label: "Sviluppatore attivo"
+    },
+]
+
+function calculateFlags(flagNumber, flags) {
+    flagNumber = BigInt(flagNumber);
+
+    let results = [];
+
+    for (let i = 0; i <= 64; i++) {
+        const bitwise = 1n << BigInt(i);
+
+        if (flagNumber & bitwise) {
+            const flag = Object.entries(flags).find((f) => f[1].shift === i)?.[0] || `UNKNOWN_FLAG_${i}`;
+            // results.push(flag);
+            results[flag] = true;
+        }
+    }
+
+    return results;
+}
 
 window.onload = async function() {
+    const path = window.location.pathname;
+    const lastPart = path.split('/').filter(Boolean).pop();
+
+    if (/^\d{10,}$/.test(lastPart)) {
+        userId = lastPart;
+    };
+
     const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
+
+    const __userFlags = await fetch(`https://flags.lewisakura.moe/flags/user.json`);
+    const _userFlags = await __userFlags.json();
+    // const _applicationFlags = (await fetch(`https://flags.lewisakura.moe/flags/application.json`)).json();
 
     if (!response.ok) {
         console.log(response)
     } else {
-        const body = JSON.parse(await response.text());
+        // const body = JSON.parse(await response.text());
+        const body = await response.json();
 
         let userData = body.data.discord_user;
         let discordId = userData.id;
@@ -41,6 +93,21 @@ window.onload = async function() {
 
         $("main").style.marginTop = "unset";
         $("main").style.opacity = "1";
+
+        let userFlags = calculateFlags(userData.public_flags, _userFlags);
+        // let applicationFlags = calculateFlags(userData.public_flags, _applicationFlags);
+
+        validFlags.forEach((flagData) => {
+            if (userFlags[flagData.id]) {
+                let element = document.createElement("span");
+                element.style.backgroundImage = `url(${flagData.img})`;
+                element.style.backgroundRepeat = "no-repeat";
+                element.style.backgroundSize = "cover";
+                element.setAttribute("label", flagData.label);
+
+                $(".flagContainer").append(element);
+            }
+        })
 
         $(".loading").style.marginTop = "200px";
         $(".loading").style.opacity = "0";

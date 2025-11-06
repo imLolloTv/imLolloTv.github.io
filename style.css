@@ -76,9 +76,45 @@ h1 {
 }
 
 h4 {
-    margin: 0 0 15px 0;
+    margin: unset;
     opacity: 0.6;
 }
+
+.flagContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.flagContainer span {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 5px 0 10px 0;
+}
+
+/* .flagContainer span::after {
+    display: none;
+    opacity: 1;
+
+    content: attr(label);
+    position: relative;
+    width: auto;
+    bottom: 30px;
+    transform: translate(-50%);
+
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    text-wrap: nowrap;
+    transition: 200ms;
+}
+
+.flagContainer span:hover::after {
+    display: inline-block;
+    opacity: 1;
+} */
 
 button {
     background-color: rgba(255, 255, 255, 0.1);
