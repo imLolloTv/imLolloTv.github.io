@@ -136,6 +136,34 @@ button:hover {
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
 }
 
+.richPresenceContainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    gap: 10px;
+}
+
+.richPresenceContainer:empty {
+    display: none;
+}
+
+.richPresenceItem {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.richPresenceItem .largeImage {
+    width: 80px;
+    border-radius: 10px;
+}
+
+.richPresenceItem .name {
+    font-weight: 600;
+}
+
 .githubLink {
     display: flex;
     position: absolute;

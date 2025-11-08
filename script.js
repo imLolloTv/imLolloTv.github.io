@@ -42,6 +42,29 @@ function calculateFlags(flagNumber, flags) {
     return results;
 }
 
+// ChatGPT 💘
+function getRichPresenceImage(input, options = {}) {
+    const { appId = null, ext = "png" } = options;
+
+    if (input.startsWith("mp:external/")) {
+        const parts = input.replace("mp:external/", "").split("/");
+        const httpIndex = parts.findIndex(p => p.startsWith("http") || p.startsWith("https"));
+        if (httpIndex !== -1) {
+            return parts.slice(httpIndex).join("/").replace(/^https\//, "https://").replace(/^http\//, "http://");
+        }
+    }
+
+    if (/^\d{17,19}$/.test(input) && appId) {
+        return `https://cdn.discordapp.com/app-assets/${appId}/${input}.${ext}`;
+    }
+
+    if (/^\d{17,19}$/.test(input)) {
+        return `https://discord.com/users/${input}`;
+    }
+
+    return input;
+}
+
 window.onload = async function() {
     const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
 
@@ -56,6 +79,9 @@ window.onload = async function() {
         const body = await response.json();
 
         let userData = body.data.discord_user;
+        let userActivities = body.data.activities;
+        let spotifyData = body.data?.spotify;
+
         let discordId = userData.id;
 
         let immagine, avatarDecoration;
@@ -101,6 +127,47 @@ window.onload = async function() {
                 $(".flagContainer").append(element);
             }
         })
+
+        if (userActivities && userActivities.length > 0) {
+            userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
+
+            userActivities.forEach((activity) => {
+                let image = getRichPresenceImage(activity?.assets?.large_image || activity?.assets?.large_image, {appId: activity.application_id})
+
+                let element = document.createElement("div");
+                element.innerHTML = `
+                    <div class="richPresenceItem">
+                        <img src="${image}" alt="" class="largeImage">
+                        <div class="text">
+                            <div class="name">${activity.name}</div>
+                            <div class="details">${activity.details}</div>
+                            <div class="state">${activity?.state}</div>
+                            <div class="time">${activity.timestamps?.start}</div>
+                        </div>
+                    </div>
+                `;
+
+                $(".richPresenceContainer").append(element);
+            });
+        };
+
+        if (spotifyData) {
+            let element = document.createElement("div");
+            element.innerHTML = `
+                <div class="richPresenceItem">
+                    <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
+                    <div class="text">
+                        <div class="name">${spotifyData.song}</div>
+                        <div class="details">${spotifyData.artist}</div>
+                        <div class="status">
+                            
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $(".richPresenceContainer").append(element);
+        }
 
         $(".loading").style.marginTop = "200px";
         $(".loading").style.opacity = "0";
