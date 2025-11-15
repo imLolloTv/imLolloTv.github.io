@@ -55,6 +55,23 @@ main {
     transition: 500ms;
 }
 
+.alert {
+    position: absolute;
+    background-color: rgba(240, 200, 0, 0.4);
+    padding: 15px 20px;
+    left: 50%;
+    top: 50px;
+    transform: translateX(-50%);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(240, 200, 0, 0.6);
+    border-radius: 15px;
+    color: rgb(240, 200, 0);
+    font-family: 'Unbounded', sans-serif;
+    /* ANIMAZIONE */
+    opacity: 0;
+    transition: 500ms;
+}
+
 .logo {
     width: 120px;
     border-radius: 100vh;
@@ -157,7 +174,26 @@ button:hover {
 
 .richPresenceItem .largeImage {
     width: 80px;
+    object-fit: contain;
     border-radius: 10px;
+}
+
+.richPresenceItem .text {
+    display: flex;
+    flex-direction: column;
+}
+
+.richPresenceItem .text > span {
+    max-width: 400px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.spotifyTitle {
+    overflow: unset!important;
+    white-space: unset!important;
+    text-overflow: unset!important;
 }
 
 .richPresenceItem .name {
@@ -168,8 +204,8 @@ button:hover {
     display: flex;
     position: absolute;
     background-color: rgb(192, 192, 192);
-    right: 10px;
-    bottom: 10px;
+    right: 15px;
+    bottom: 15px;
     border-radius: 50px;
     font-family: 'Unbounded', sans-serif;
     align-items: center;

@@ -58,10 +58,6 @@ function getRichPresenceImage(input, options = {}) {
         return `https://cdn.discordapp.com/app-assets/${appId}/${input}.${ext}`;
     }
 
-    if (/^\d{17,19}$/.test(input)) {
-        return `https://discord.com/users/${input}`;
-    }
-
     return input;
 }
 
@@ -134,16 +130,16 @@ window.onload = async function() {
             userActivities.forEach((activity) => {
                 let image = getRichPresenceImage(activity?.assets?.large_image || activity?.assets?.large_image, {appId: activity.application_id})
 
+                // WIP
                 let element = document.createElement("div");
+                element.classList.add("richPresenceItem");
                 element.innerHTML = `
-                    <div class="richPresenceItem">
-                        <img src="${image}" alt="" class="largeImage">
-                        <div class="text">
-                            <div class="name">${activity.name}</div>
-                            <div class="details">${activity.details}</div>
-                            <div class="state">${activity?.state}</div>
-                            <div class="time">${activity.timestamps?.start}</div>
-                        </div>
+                    <img src="${image}" alt="" class="largeImage">
+                    <div class="text">
+                        <span class="name">${activity.name}</span>
+                        <span class="details">${activity.details}</span>
+                        <span class="state">${activity?.state}</span>
+                        <span class="time">${activity.timestamps?.start}</span>
                     </div>
                 `;
 
@@ -151,17 +147,17 @@ window.onload = async function() {
             });
         };
 
+        // WIP
         if (spotifyData) {
             let element = document.createElement("div");
+            element.classList.add("richPresenceItem");
             element.innerHTML = `
-                <div class="richPresenceItem">
-                    <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
-                    <div class="text">
-                        <div class="name">${spotifyData.song}</div>
-                        <div class="details">${spotifyData.artist}</div>
-                        <div class="status">
-                            
-                        </div>
+                <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
+                <div class="text">
+                    <span class="name spotifyTitle">${spotifyData.song}</span>
+                    <span class="details">${spotifyData.artist}</span>
+                    <div class="status">
+                        
                     </div>
                 </div>
             `;
@@ -175,6 +171,8 @@ window.onload = async function() {
         $("#apriProfilo").onclick = function() {
             window.open(`https://discord.com/users/${discordId}`);
         };
+
+        $(".alert").style.opacity = "1";
     };
 
     $(".githubLink").onclick = function() {
