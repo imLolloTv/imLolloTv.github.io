@@ -170,10 +170,21 @@ button:hover {
     display: flex;
     flex-direction: row;
     gap: 10px;
+    animation: richPresenceItemFade 0.5s linear 1;
+}
+
+@keyframes richPresenceItemFade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .richPresenceItem .largeImage {
     width: 80px;
+    height: 80px;
     object-fit: contain;
     border-radius: 10px;
 }
@@ -188,6 +199,10 @@ button:hover {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.richPresenceItem .text .time {
+    color: rgb(93, 255, 93);
 }
 
 .spotifyTitle {

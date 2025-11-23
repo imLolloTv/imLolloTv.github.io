@@ -61,6 +61,93 @@ function getRichPresenceImage(input, options = {}) {
     return input;
 }
 
+function getTimestamp(currentTimestamp, startTimestamp) {
+    let diff = currentTimestamp - startTimestamp;
+    
+    let secondi = Math.floor(diff / 1000);
+    let minuti = Math.floor(secondi / 60);
+    let ore = Math.floor(minuti / 60);
+    let giorni = Math.floor(ore / 24);
+
+    secondi %= 60;
+    minuti %= 60;
+    ore %= 24;
+
+    return `${giorni > 0 && (`${giorni}g `) || ""}${ore > 0 && (`${ore}h `) || ""}${minuti || 0}m ${secondi}s`;
+}
+
+function getSpotifyTimestamp(currentTimestamp, startTimestamp, endTimestamp) {
+    let duration = endTimestamp - startTimestamp;
+    let elapsed = currentTimestamp - startTimestamp;
+
+    let durationSecondi = Math.floor(duration / 1000);
+    let durationMinuti = Math.floor(durationSecondi / 60);
+
+    let elapsedSecondi = Math.floor(elapsed / 1000);
+    let elapsedMinuti = Math.floor(elapsedSecondi / 60);
+
+    durationSecondi %= 60;
+    elapsedSecondi %= 60;
+
+    return {
+        elapsed: `${String(elapsedMinuti).padStart(2, "0")}:${String(elapsedSecondi).padStart(2, "0")}`, 
+        duration: `${String(durationMinuti).padStart(2, "0")}:${String(durationSecondi).padStart(2, "0")}`,
+        perc: Math.floor((elapsed / duration) * 100)
+    }
+}
+
+function userActivity(userActivities, spotifyData) {
+    $(".richPresenceContainer").innerHTML = "";
+
+    let currentTimestamp = Date.now();
+
+    if (userActivities && userActivities.length > 0) {
+        userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
+
+        userActivities.forEach((activity) => {
+            let image = getRichPresenceImage(activity?.assets?.large_image || activity?.assets?.large_image, {appId: activity.application_id})
+
+            let element = document.createElement("div");
+            element.classList.add("richPresenceItem");
+            element.innerHTML = `
+                <img src="${image}" alt="" class="largeImage">
+                <div class="text">
+                    <span class="name">${activity.name}</span>
+                    <span class="details">${activity.details}</span>
+                    <span class="state">${activity?.state}</span>
+                    <span class="time" activity>
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">${getTimestamp(currentTimestamp, activity.timestamps?.start)}</span>
+                    </span>
+                </div>
+            `;
+
+            $(".richPresenceContainer").append(element);
+        });
+    };
+
+    // WIP
+    if (spotifyData) {
+        let data = getSpotifyTimestamp(currentTimestamp, spotifyData?.timestamps?.start, spotifyData?.timestamps?.end);
+        
+        let element = document.createElement("div");
+        element.classList.add("richPresenceItem");
+        element.innerHTML = `
+            <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
+            <div class="text">
+                <span class="name spotifyTitle">${spotifyData.song}</span>
+                <span class="details">${spotifyData.artist}</span>
+                <div class="status" activitySpotify data-start="${spotifyData?.timestamps?.start}" data-end="${spotifyData?.timestamps?.end}">
+                    ${data.elapsed} ${data.duration} - ${data.perc}%
+                </div>
+            </div>
+        `;
+
+
+        $(".richPresenceContainer").append(element);
+    }
+}
+
 window.onload = async function() {
     const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
 
@@ -124,46 +211,7 @@ window.onload = async function() {
             }
         })
 
-        if (userActivities && userActivities.length > 0) {
-            userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
-
-            userActivities.forEach((activity) => {
-                let image = getRichPresenceImage(activity?.assets?.large_image || activity?.assets?.large_image, {appId: activity.application_id})
-
-                // WIP
-                let element = document.createElement("div");
-                element.classList.add("richPresenceItem");
-                element.innerHTML = `
-                    <img src="${image}" alt="" class="largeImage">
-                    <div class="text">
-                        <span class="name">${activity.name}</span>
-                        <span class="details">${activity.details}</span>
-                        <span class="state">${activity?.state}</span>
-                        <span class="time">${activity.timestamps?.start}</span>
-                    </div>
-                `;
-
-                $(".richPresenceContainer").append(element);
-            });
-        };
-
-        // WIP
-        if (spotifyData) {
-            let element = document.createElement("div");
-            element.classList.add("richPresenceItem");
-            element.innerHTML = `
-                <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
-                <div class="text">
-                    <span class="name spotifyTitle">${spotifyData.song}</span>
-                    <span class="details">${spotifyData.artist}</span>
-                    <div class="status">
-                        
-                    </div>
-                </div>
-            `;
-
-            $(".richPresenceContainer").append(element);
-        }
+        userActivity(userActivities, spotifyData);
 
         $(".loading").style.marginTop = "200px";
         $(".loading").style.opacity = "0";
@@ -174,6 +222,39 @@ window.onload = async function() {
 
         $(".alert").style.opacity = "1";
     };
+
+    setInterval(() => {
+        let currentTimestamp = Date.now();
+    
+        document.querySelectorAll("[activity] span").forEach((element) => {
+            let startTimestamp = parseInt(element.getAttribute("data-timestampStart"), 10);
+            
+            element.textContent = getTimestamp(currentTimestamp, startTimestamp);
+        });
+
+        let spotifyElement = $("[activitySpotify]");
+        if (spotifyElement) {
+            let data = getSpotifyTimestamp(currentTimestamp, spotifyElement.getAttribute("data-start"), spotifyElement.getAttribute("data-end"));
+
+            // WIP
+            spotifyElement.innerHTML = `${data.elapsed} ${data.duration} - ${data.perc}%`;
+        }
+    }, 500);
+
+    setInterval(async () => {
+        const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
+
+        if (!response.ok) {
+            console.log(response)
+        } else {
+            const body = await response.json();
+    
+            let userActivities = body.data.activities;
+            let spotifyData = body.data?.spotify;
+    
+            userActivity(userActivities, spotifyData);
+        };
+    }, 5000);
 
     $(".githubLink").onclick = function() {
         window.open("https://github.com/imLolloTv/imLolloTv.github.io");
