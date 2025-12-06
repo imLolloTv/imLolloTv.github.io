@@ -276,7 +276,7 @@ window.onload = async function() {
             window.open(`https://discord.com/users/${discordId}`);
         };
 
-        $(".alert").style.opacity = "1";
+        // $(".alert").style.opacity = "1";
     };
 
     setInterval(() => {
