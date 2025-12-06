@@ -133,7 +133,7 @@ h4 {
     opacity: 1;
 } */
 
-button {
+button, a {
     background-color: rgba(255, 255, 255, 0.1);
     padding: 8px;
     backdrop-filter: blur(4px);
@@ -143,14 +143,37 @@ button {
     color: white;
     font-family: 'Unbounded', sans-serif;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    text-decoration: none;
     cursor: pointer;
     transition: 200ms;
 }
 
-button:hover {
+button:hover, a:hover {
     background-color: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+}
+
+.links {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.links .link {
+    display: flex;
+    width: 1.8rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;
+    border-radius: 9999vh;
+}
+
+.links .link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .richPresenceContainer {
@@ -192,6 +215,8 @@ button:hover {
 .richPresenceItem .text {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+    font-size: 0.8rem;
 }
 
 .richPresenceItem .text > span {
@@ -202,6 +227,7 @@ button:hover {
 }
 
 .richPresenceItem .text .time {
+    margin-top: 1%;
     color: rgb(93, 255, 93);
 }
 
@@ -213,14 +239,41 @@ button:hover {
 
 .richPresenceItem .name {
     font-weight: 600;
+    font-size: 1rem;
+}
+
+.richPresenceItem .status {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1%;
+    align-items: center;
+}
+
+.richPresenceItem .status > span {
+    width: 2.7rem;
+}
+
+.richPresenceItem .status .bar {
+    background-color: rgba(255, 255, 255, 0.2);
+    flex-grow: 1;
+    height: 0.5vh;
+    margin: 0 3%;
+    border-radius: 9999vh;
+    overflow: hidden;
+}
+
+.richPresenceItem .status .bar > div {
+    background-color: rgba(255, 255, 255, 0.2);
+    height: 100%;
+    transition: width 1s linear;
 }
 
 .githubLink {
     display: flex;
     position: absolute;
-    background-color: rgb(192, 192, 192);
     right: 15px;
     bottom: 15px;
+    padding: unset;
     border-radius: 50px;
     font-family: 'Unbounded', sans-serif;
     align-items: center;
@@ -231,7 +284,6 @@ button:hover {
     --grandezzaIcona: 28px;
 
     display: flex;
-    background-color: white;
     padding: 6px;
     font-size: var(--grandezzaIcona);
     width: var(--grandezzaIcona);

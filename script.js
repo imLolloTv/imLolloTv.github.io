@@ -24,6 +24,29 @@ const validFlags = [
     },
 ]
 
+const links = [
+    {
+        icon: "fa-brands fa-steam",
+        link: "https://steamcommunity.com/id/imlollotv/"
+    },
+    {
+        icon: "fa-brands fa-instagram",
+        link: "https://www.instagram.com/n.loreee"
+    },
+    {
+        icon: "fa-brands fa-spotify",
+        link: "https://open.spotify.com/user/zsevit1zzx7k35va3b45uiy9t"
+    },
+    {
+        icon: "fa-solid fa-chart-simple",
+        link: "https://stats.fm/n.loreee"
+    },
+    {
+        icon: "fa-brands fa-twitch",
+        link: "https://www.twitch.tv/imLolloTv"
+    },
+]
+
 function calculateFlags(flagNumber, flags) {
     flagNumber = BigInt(flagNumber);
 
@@ -34,7 +57,6 @@ function calculateFlags(flagNumber, flags) {
 
         if (flagNumber & bitwise) {
             const flag = Object.entries(flags).find((f) => f[1].shift === i)?.[0] || `UNKNOWN_FLAG_${i}`;
-            // results.push(flag);
             results[flag] = true;
         }
     }
@@ -97,7 +119,7 @@ function getSpotifyTimestamp(currentTimestamp, startTimestamp, endTimestamp) {
 }
 
 function userActivity(userActivities, spotifyData) {
-    $(".richPresenceContainer").innerHTML = "";
+    $(".standardActivity")?.remove();
 
     let currentTimestamp = Date.now();
 
@@ -109,42 +131,63 @@ function userActivity(userActivities, spotifyData) {
 
             let element = document.createElement("div");
             element.classList.add("richPresenceItem");
+            element.classList.add("standardActivity");
+
             element.innerHTML = `
                 <img src="${image}" alt="" class="largeImage">
                 <div class="text">
                     <span class="name">${activity.name}</span>
-                    <span class="details">${activity.details}</span>
-                    <span class="state">${activity?.state}</span>
+                    ${
+                        activity?.details && (
+                            `<span class="state">${activity?.details}</span>`
+                        ) || ""
+                    } 
+                    ${
+                        activity?.state && (
+                            `<span class="state">${activity?.state}</span>`
+                        ) || ""
+                    } 
                     <span class="time" activity>
-                        <i class="fa-solid fa-gamepad"></i>
+                        <i class="fa-regular fa-clock"></i>
                         <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">${getTimestamp(currentTimestamp, activity.timestamps?.start)}</span>
                     </span>
                 </div>
             `;
 
-            $(".richPresenceContainer").append(element);
+            $(".richPresenceContainer").prepend(element);
         });
     };
 
-    // WIP
-    if (spotifyData) {
+    let currentSpotifyTitle = $(".spotifyTitle")?.textContent;
+
+    if (spotifyData && spotifyData.song != currentSpotifyTitle) {
+        $(".spotifyActivity")?.remove();
+
         let data = getSpotifyTimestamp(currentTimestamp, spotifyData?.timestamps?.start, spotifyData?.timestamps?.end);
         
         let element = document.createElement("div");
         element.classList.add("richPresenceItem");
+        element.classList.add("spotifyActivity");
+
         element.innerHTML = `
             <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
             <div class="text">
                 <span class="name spotifyTitle">${spotifyData.song}</span>
                 <span class="details">${spotifyData.artist}</span>
                 <div class="status" activitySpotify data-start="${spotifyData?.timestamps?.start}" data-end="${spotifyData?.timestamps?.end}">
-                    ${data.elapsed} ${data.duration} - ${data.perc}%
+                    <span activitySpotifyElapsed>${data.elapsed}</span>
+                    <div class="bar">
+                        <div activitySpotifyBar style="width: ${data.perc}%"></div>
+                    </div>
+                    <span activitySpotifyDuration>${data.duration}</span>
                 </div>
             </div>
         `;
 
 
         $(".richPresenceContainer").append(element);
+    } else if (!spotifyData) {
+        $(".spotifyActivity")?.remove();
     }
 }
 
@@ -153,12 +196,13 @@ window.onload = async function() {
 
     const __userFlags = await fetch(`https://flags.lewisakura.moe/flags/user.json`);
     const _userFlags = await __userFlags.json();
-    // const _applicationFlags = (await fetch(`https://flags.lewisakura.moe/flags/application.json`)).json();
+
+    // const __applicationFlags = await fetch(`https://flags.lewisakura.moe/flags/application.json`);
+    // const _applicationFlags = await __applicationFlags.json();
 
     if (!response.ok) {
         console.log(response)
     } else {
-        // const body = JSON.parse(await response.text());
         const body = await response.json();
 
         let userData = body.data.discord_user;
@@ -192,6 +236,18 @@ window.onload = async function() {
         $("h4").innerHTML = userData.username;
 
         document.title = `${userData.global_name} (@${userData.username})`
+
+        links.forEach((link) => {
+            let element = document.createElement("a");
+            element.classList.add("link")
+            element.href = link.link;
+
+            element.innerHTML = `
+                <i class="${link.icon}"></i>
+            `;
+
+            $(".links").append(element);
+        })
 
         $("main").style.marginTop = "unset";
         $("main").style.opacity = "1";
@@ -236,8 +292,11 @@ window.onload = async function() {
         if (spotifyElement) {
             let data = getSpotifyTimestamp(currentTimestamp, spotifyElement.getAttribute("data-start"), spotifyElement.getAttribute("data-end"));
 
-            // WIP
-            spotifyElement.innerHTML = `${data.elapsed} ${data.duration} - ${data.perc}%`;
+            if (data.perc < 100) {
+                $("[activitySpotifyElapsed]").innerHTML = data.elapsed;
+                $("[activitySpotifyBar]").style.width = `${data.perc}%`;
+                $("[activitySpotifyDuration]").innerHTML = data.duration;
+            };
         }
     }, 500);
 
@@ -256,7 +315,10 @@ window.onload = async function() {
         };
     }, 5000);
 
-    $(".githubLink").onclick = function() {
-        window.open("https://github.com/imLolloTv/imLolloTv.github.io");
-    };
+    document.querySelectorAll("a").forEach((element) => {
+        element.onclick = function(event) {
+            event.preventDefault();
+            window.open(this.href);
+        };
+    });    
 }
