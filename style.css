@@ -187,11 +187,23 @@ button:hover, a:hover {
 .richPresenceContainer {
     display: flex;
     flex-direction: column;
+    min-width: 100%;
     margin-top: 20px;
     padding-top: 10px;
-    border-top: 1px solid rgba(var(--mainColor), 0.2);
+    /* border-top: 1px solid rgba(var(--mainColor), 0.2); */
     gap: 10px;
     text-align: left;
+}
+
+.richPresenceContainer::before {
+    content: " ";
+    position: relative;
+    background-color: rgba(var(--mainColor), 0.4);
+    width: 80%;
+    height: 1px;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
 }
 
 .richPresenceContainer:empty {
@@ -217,7 +229,7 @@ button:hover, a:hover {
 .richPresenceItem .largeImage {
     width: 80px;
     height: 80px;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 10px;
 }
 

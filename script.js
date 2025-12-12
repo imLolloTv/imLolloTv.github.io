@@ -127,7 +127,7 @@ function userActivity(userActivities, spotifyData) {
         userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
 
         userActivities.forEach((activity) => {
-            let image = getRichPresenceImage(activity?.assets?.large_image || activity?.assets?.large_image, {appId: activity.application_id})
+            let image = getRichPresenceImage(activity?.assets?.large_image || "./assets/img/placeholder.png", {appId: activity.application_id})
 
             let element = document.createElement("div");
             element.classList.add("richPresenceItem");
