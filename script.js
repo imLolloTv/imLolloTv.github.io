@@ -95,7 +95,7 @@ function getTimestamp(currentTimestamp, startTimestamp) {
     minuti %= 60;
     ore %= 24;
 
-    return `${giorni > 0 && (`${giorni}g `) || ""}${ore > 0 && (`${ore}h `) || ""}${minuti || 0}m ${secondi}s`;
+    return `${giorni > 0 && (`${giorni}g `) || ""}${ore > 0 && (`${ore}h `) || ""}${minuti || 0}m ${secondi || 0}s`;
 }
 
 function getSpotifyTimestamp(currentTimestamp, startTimestamp, endTimestamp) {
@@ -149,7 +149,7 @@ function userActivity(userActivities, spotifyData) {
                     } 
                     <span class="time" activity>
                         <i class="fa-regular fa-clock"></i>
-                        <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">${getTimestamp(currentTimestamp, activity.timestamps?.start)}</span>
+                        <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">${getTimestamp(currentTimestamp, activity.timestamps?.start) || "0m 0s"}</span>
                     </span>
                 </div>
             `;
@@ -175,11 +175,11 @@ function userActivity(userActivities, spotifyData) {
                 <span class="name spotifyTitle">${spotifyData.song}</span>
                 <span class="details">${spotifyData.artist}</span>
                 <div class="status" activitySpotify data-start="${spotifyData?.timestamps?.start}" data-end="${spotifyData?.timestamps?.end}">
-                    <span activitySpotifyElapsed>${data.elapsed}</span>
+                    <span activitySpotifyElapsed>${data.elapsed || "00:00"}</span>
                     <div class="bar">
-                        <div activitySpotifyBar style="width: ${data.perc}%"></div>
+                        <div activitySpotifyBar style="width: ${data.perc || 0}%"></div>
                     </div>
-                    <span activitySpotifyDuration>${data.duration}</span>
+                    <span activitySpotifyDuration>${data.duration || "00:00"}</span>
                 </div>
             </div>
         `;
@@ -285,7 +285,7 @@ window.onload = async function() {
         document.querySelectorAll("[activity] span").forEach((element) => {
             let startTimestamp = parseInt(element.getAttribute("data-timestampStart"), 10);
             
-            element.textContent = getTimestamp(currentTimestamp, startTimestamp);
+            element.textContent = getTimestamp(currentTimestamp, startTimestamp) || "0m 0s";
         });
 
         let spotifyElement = $("[activitySpotify]");
@@ -293,9 +293,9 @@ window.onload = async function() {
             let data = getSpotifyTimestamp(currentTimestamp, spotifyElement.getAttribute("data-start"), spotifyElement.getAttribute("data-end"));
 
             if (data.perc < 100) {
-                $("[activitySpotifyElapsed]").innerHTML = data.elapsed;
-                $("[activitySpotifyBar]").style.width = `${data.perc}%`;
-                $("[activitySpotifyDuration]").innerHTML = data.duration;
+                $("[activitySpotifyElapsed]").innerHTML = data.elapsed || "00:00";
+                $("[activitySpotifyBar]").style.width = `${data.perc || 0}%`;
+                $("[activitySpotifyDuration]").innerHTML = data.duration || "00:00";
             };
         }
     }, 500);
