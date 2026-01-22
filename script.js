@@ -27,23 +27,33 @@ const validFlags = [
 const links = [
     {
         icon: "fa-brands fa-steam",
-        link: "https://steamcommunity.com/id/imlollotv/"
+        link: "https://steamcommunity.com/id/imlollotv/",
+        label: "Steam"
     },
     {
         icon: "fa-brands fa-instagram",
-        link: "https://www.instagram.com/n.loreee"
+        link: "https://www.instagram.com/n.loreee",
+        label: "Instagram"
     },
     {
         icon: "fa-brands fa-spotify",
-        link: "https://open.spotify.com/user/zsevit1zzx7k35va3b45uiy9t"
+        link: "https://open.spotify.com/user/zsevit1zzx7k35va3b45uiy9t",
+        label: "Spotify"
+    },
+    {
+        icon: "fa-brands fa-tiktok",
+        link: "https://www.tiktok.com/@n.loreee",
+        label: "TikTok"
     },
     {
         icon: "fa-solid fa-chart-simple",
-        link: "https://stats.fm/n.loreee"
+        link: "https://stats.fm/n.loreee",
+        label: "Stats.fm"
     },
     {
         icon: "fa-brands fa-twitch",
-        link: "https://www.twitch.tv/imLolloTv"
+        link: "https://www.twitch.tv/imLolloTv",
+        label: "Twitch"
     },
 ]
 
@@ -239,8 +249,10 @@ window.onload = async function() {
 
         links.forEach((link) => {
             let element = document.createElement("a");
+            element.classList.add("styled")
             element.classList.add("link")
             element.href = link.link;
+            element.setAttribute("label", link.label)
 
             element.innerHTML = `
                 <i class="${link.icon}"></i>

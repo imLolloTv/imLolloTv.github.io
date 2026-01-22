@@ -88,8 +88,8 @@ main {
 
 .avatarDecoration {
     position: absolute;
-    width: 120px;
-    margin-top: 2px;
+    width: 145px;
+    margin-top: -10px;
 }
 
 .avatarDecoration[src=""] {
@@ -117,31 +117,40 @@ h4 {
     margin: 5px 0 10px 0;
 }
 
-/* .flagContainer span::after {
-    display: none;
-    opacity: 1;
+.flagContainer span::after {
+    display: inline-block;
+    opacity: 0;
 
     content: attr(label);
     position: relative;
     width: auto;
-    bottom: 30px;
-    transform: translate(-50%);
+    bottom: 40px;
+    transform: translateX(calc(-50% + 15px));
 
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(var(--mainColor), 0.1);
     padding: 8px;
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(var(--mainColor), 0.2);
     border-radius: 15px;
+    font-size: 14px;
     text-wrap: nowrap;
-    transition: 200ms;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: opacity 200ms;
+
+    pointer-events: none;
 }
 
 .flagContainer span:hover::after {
-    display: inline-block;
     opacity: 1;
-} */
+    transition: opacity 200ms;
+}
 
-button, a {
+a {
+    color: white;
+    text-decoration: none;
+}
+
+button, a.styled {
     background-color: rgba(var(--mainColor), 0.1);
     padding: 8px;
     backdrop-filter: blur(4px);
@@ -151,12 +160,11 @@ button, a {
     color: white;
     font-family: 'Unbounded', sans-serif;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-    text-decoration: none;
     cursor: pointer;
     transition: 200ms;
 }
 
-button:hover, a:hover {
+button:hover, a.styled:hover {
     background-color: rgba(var(--mainColor), 0.2);
     border: 1px solid rgba(var(--mainColor), 0.5);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
@@ -170,11 +178,8 @@ button:hover, a:hover {
 }
 
 .links .link {
-    display: flex;
     width: 1.8rem;
     height: 1.8rem;
-    justify-content: center;
-    align-items: center;
     font-size: 1.4rem;
     border-radius: 9999vh;
 }
@@ -182,6 +187,41 @@ button:hover, a:hover {
 .links .link:hover {
     background-color: rgba(var(--mainColor), 0.2);
     border: 1px solid rgba(var(--mainColor), 0.5);
+}
+
+.links .link i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.links .link::after {
+    display: inline-block;
+    opacity: 0;
+
+    content: attr(label);
+    position: relative;
+    width: auto;
+    top: 42px;
+    transform: translateX(calc(-50% + 0.9rem));
+
+    background-color: rgba(var(--mainColor), 0.1);
+    padding: 8px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(var(--mainColor), 0.2);
+    border-radius: 15px;
+    font-size: 12px;
+    text-wrap: nowrap;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: opacity 200ms;
+
+    pointer-events: none;
+}
+
+.links .link:hover::after {
+    opacity: 1;
+    transition: opacity 200ms;
 }
 
 .richPresenceContainer {
@@ -294,11 +334,35 @@ button:hover, a:hover {
     position: absolute;
     right: 15px;
     bottom: 15px;
-    padding: unset;
-    border-radius: 50px;
+    padding: unset!important;
+    border-radius: 50px!important;
     font-family: 'Unbounded', sans-serif;
     align-items: center;
     cursor: pointer;
+    transition: 200ms;
+}
+
+.githubLink span {
+    display: flex;
+    background-color: white;
+    width: 0;
+    height: 0;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: black;
+    border-radius: 50px;
+    font-size: 16px;
+    text-shadow: none;
+    text-overflow: hidden;
+    white-space: nowrap;
+    transition: width 500ms, height 500ms;
+}
+
+.githubLink:hover span {
+    width: 150px;
+    height: 32px;
+    margin-left: 3px;
 }
 
 .githubLink i {
@@ -309,4 +373,21 @@ button:hover, a:hover {
     font-size: var(--grandezzaIcona);
     width: var(--grandezzaIcona);
     border-radius: 50px;
+}
+
+.watermark {
+    position: absolute;
+    left: 50%;
+    bottom: 15px;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 10px;
+    font-family: 'Unbounded', sans-serif;
+    opacity: 0.05;
+    transition: 500ms;
+}
+
+.watermark:hover {
+    font-size: 14px;
+    opacity: 0.4;
 }
