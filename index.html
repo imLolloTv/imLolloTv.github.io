@@ -17,23 +17,36 @@
     <body>
         <video src="./assets/video/background.mp4" autoplay muted loop loading="lazy"></video>
 
-        <main style="z-index: 1;">
-            <img class="logo" src="./assets/img/logo.png" loading="lazy">
-            <img class="avatarDecoration" src="" loading="lazy">
+        <div class="sectionContainer">
+            <section class="main">
+                <main style="z-index: 1;">
+                    <img class="logo" src="./assets/img/logo.png" loading="lazy">
+                    <img class="avatarDecoration" src="" loading="lazy">
 
-            <h1>Lollo</h1>
-            <h4>imlollotv</h1>
-            <div class="flagContainer"></div>
+                    <h1>Lollo</h1>
+                    <h4>imlollotv</h1>
+                    <div class="flagContainer"></div>
 
-            <button id="apriProfilo">
-                <i class="fa-brands fa-discord"></i>
-                Vedi su Discord
-            </button>
+                    <button id="apriProfilo">
+                        <i class="fa-brands fa-discord"></i>
+                        Vedi su Discord
+                    </button>
 
-            <div class="links"></div>
+                    <div class="links"></div>
 
-            <div class="richPresenceContainer"></div>
-        </main>
+                    <div class="richPresenceContainer"></div>
+                </main>
+
+                <div class="nav navRight"></div>
+            </section>
+            <section class="projects">
+                <div class="nav navLeft"></div>
+                
+                <main class="alert" style="z-index: 1; opacity: 1; margin: unset; top: 50%; transform: translate(-50%, -50%);">
+                    🚧 Work in progress 🚧
+                </main>
+            </section>
+        </div>
         
         <main class="loading">
             Caricamento in corso...

@@ -202,6 +202,10 @@ function userActivity(userActivities, spotifyData) {
 }
 
 window.onload = async function() {
+    document.querySelectorAll(".nav").forEach((element) => {
+        element.classList.add("disabled");
+    });
+
     const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
 
     const __userFlags = await fetch(`https://flags.lewisakura.moe/flags/user.json`);
@@ -288,6 +292,10 @@ window.onload = async function() {
             window.open(`https://discord.com/users/${discordId}`);
         };
 
+        document.querySelectorAll(".nav").forEach((element) => {
+            element.classList.remove("disabled");
+        });
+
         // $(".alert").style.opacity = "1";
     };
 
@@ -332,5 +340,33 @@ window.onload = async function() {
             event.preventDefault();
             window.open(this.href);
         };
-    });    
+    });
+
+    let currentIndex = 0;
+
+    document.querySelectorAll(".navRight").forEach((element) => {
+        element.onclick = function(event) {
+            let parent = element.parentElement;
+            
+            if (parent.nextSibling) {
+                parent.style.left = `-${100 * (currentIndex + 1)}%`;
+                parent.nextElementSibling.style.left = `-${100 * (currentIndex + 1)}%`;
+
+                currentIndex += 1;
+            };
+        };
+    });
+
+    document.querySelectorAll(".navLeft").forEach((element) => {
+        element.onclick = function(event) {
+            let parent = element.parentElement;
+            
+            if (parent.previousSibling) {
+                currentIndex -= 1;
+
+                parent.style.left = `-${100 * (currentIndex)}%`;
+                parent.previousElementSibling.style.left = `-${100 * (currentIndex)}%`;
+            };
+        };
+    });
 }
