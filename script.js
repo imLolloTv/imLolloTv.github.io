@@ -299,6 +299,32 @@ window.onload = async function() {
         // $(".alert").style.opacity = "1";
     };
 
+    const repoResponse = await fetch("https://api.github.com/users/imlollotv/repos");
+
+    if (!repoResponse.ok) {
+        console.log(repoResponse)
+    } else {
+        const body = await repoResponse.json();
+        
+        document.querySelector(".repoContainer").innerHTML = "";
+        body.forEach(function(repo) {
+            let element = document.createElement("div");
+            element.classList.add("repo");
+            element.innerHTML = `
+                <h3>${repo.name}</h3>
+                <p>${repo.description || ""}</p>
+            `;
+            element.href = repo.html_url;
+            element.setAttribute("name", repo.name);
+            
+            if (repo.archived) {
+                element.classList.add("archived");
+            };
+
+            $(".repoContainer").append(element);
+        });
+    };
+
     setInterval(() => {
         let currentTimestamp = Date.now();
     
@@ -335,7 +361,7 @@ window.onload = async function() {
         };
     }, 5000);
 
-    document.querySelectorAll("a").forEach((element) => {
+    document.querySelectorAll("a, .repo").forEach((element) => {
         element.onclick = function(event) {
             event.preventDefault();
             window.open(this.href);
@@ -343,12 +369,20 @@ window.onload = async function() {
     });
 
     let currentIndex = 0;
+    let duringAnim = false;
 
     document.querySelectorAll(".navRight").forEach((element) => {
         element.onclick = function(event) {
+            if (duringAnim) return;
+
             let parent = element.parentElement;
             
             if (parent.nextSibling) {
+                duringAnim = true;
+                setTimeout(() => {
+                    duringAnim = false;
+                }, 2000)
+
                 parent.style.left = `-${100 * (currentIndex + 1)}%`;
                 parent.nextElementSibling.style.left = `-${100 * (currentIndex + 1)}%`;
 
@@ -359,9 +393,16 @@ window.onload = async function() {
 
     document.querySelectorAll(".navLeft").forEach((element) => {
         element.onclick = function(event) {
+            if (duringAnim) return;
+
             let parent = element.parentElement;
             
             if (parent.previousSibling) {
+                duringAnim = true;
+                setTimeout(() => {
+                    duringAnim = false;
+                }, 2000)
+
                 currentIndex -= 1;
 
                 parent.style.left = `-${100 * (currentIndex)}%`;

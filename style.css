@@ -156,7 +156,7 @@ main {
     display: none;
 }
 
-h1 {
+h1, h2 {
     margin: 5px 0;
 }
 
@@ -387,6 +387,62 @@ button:hover, a.styled:hover {
     background-color: rgba(var(--mainColor), 0.2);
     height: 100%;
     transition: width 1s linear;
+}
+
+.repoContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: 40rem;
+    margin-top: 10px;
+    overflow: auto;
+    gap: 0.5rem;
+}
+
+.repo {
+    text-align: left;
+    background-color: rgba(var(--mainColor), 0.1);
+    padding: 16px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(var(--mainColor), 0.2);
+    border-radius: 15px;
+    outline: none;
+    color: white;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    flex-grow: 1;
+    flex-shrink: 1;
+    order: 0;
+    transition: 200ms;
+}
+
+.repo.archived {
+    --mainColor: 235, 160, 10;
+    box-shadow: inset 0 -10px 10px -10px rgb(var(--mainColor));
+    
+    order: 1;
+}
+
+.repo[name="imLolloTv.github.io"] {
+    --mainColor: 146, 13, 255;
+    box-shadow: inset 0 -10px 10px -10px rgb(var(--mainColor));
+    
+    order: -1;
+}
+
+.repo:hover {
+    background-color: rgba(var(--mainColor), 0.2);
+    border: 1px solid rgba(var(--mainColor), 0.5);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+}
+
+h3, p {
+    margin: unset;
+}
+
+p {
+    opacity: 0.6;
+    font-size: 0.8rem;
 }
 
 .githubLink {
