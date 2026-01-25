@@ -57,6 +57,8 @@ const links = [
     },
 ]
 
+let detectableApps;
+
 function calculateFlags(flagNumber, flags) {
     flagNumber = BigInt(flagNumber);
 
@@ -74,11 +76,10 @@ function calculateFlags(flagNumber, flags) {
     return results;
 }
 
-// ChatGPT 💘
 function getRichPresenceImage(input, options = {}) {
     const { appId = null, ext = "png" } = options;
 
-    if (input.startsWith("mp:external/")) {
+    if (input && input.startsWith("mp:external/")) {
         const parts = input.replace("mp:external/", "").split("/");
         const httpIndex = parts.findIndex(p => p.startsWith("http") || p.startsWith("https"));
         if (httpIndex !== -1) {
@@ -86,11 +87,19 @@ function getRichPresenceImage(input, options = {}) {
         }
     }
 
-    if (/^\d{17,19}$/.test(input) && appId) {
+    if (input && /^\d{17,19}$/.test(input) && appId) {
         return `https://cdn.discordapp.com/app-assets/${appId}/${input}.${ext}`;
     }
 
-    return input;
+    if (appId && detectableApps) {
+        for (const application of detectableApps) {
+            if (application.id == appId) {
+                return `https://cdn.discordapp.com/app-icons/${appId}/${application.icon_hash}.${ext}`;
+            };
+        };
+    };
+
+    return "./assets/img/placeholder.png";
 }
 
 function getTimestamp(currentTimestamp, startTimestamp) {
@@ -137,7 +146,8 @@ function userActivity(userActivities, spotifyData) {
         userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
 
         userActivities.forEach((activity) => {
-            let image = getRichPresenceImage(activity?.assets?.large_image || "./assets/img/placeholder.png", {appId: activity.application_id})
+            let image = getRichPresenceImage(activity?.assets?.large_image, {appId: activity.application_id});
+            console.log(image);
 
             let element = document.createElement("div");
             element.classList.add("richPresenceItem");
@@ -213,6 +223,9 @@ window.onload = async function() {
 
     // const __applicationFlags = await fetch(`https://flags.lewisakura.moe/flags/application.json`);
     // const _applicationFlags = await __applicationFlags.json();
+
+    const _detectableApps = await fetch("https://discord.com/api/v9/applications/detectable");
+    detectableApps = await _detectableApps.json();
 
     if (!response.ok) {
         console.log(response)
