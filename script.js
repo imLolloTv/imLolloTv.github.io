@@ -147,14 +147,13 @@ function userActivity(userActivities, spotifyData) {
 
         userActivities.forEach((activity) => {
             let image = getRichPresenceImage(activity?.assets?.large_image, {appId: activity.application_id});
-            console.log(image);
 
             let element = document.createElement("div");
             element.classList.add("richPresenceItem");
             element.classList.add("standardActivity");
 
             element.innerHTML = `
-                <img src="${image}" alt="" class="largeImage">
+                <img src="${image || ""}" alt="" class="largeImage">
                 <div class="text">
                     <span class="name">${activity.name}</span>
                     ${

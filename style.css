@@ -328,6 +328,10 @@ button:hover, a.styled:hover {
     }
 }
 
+img[src=""] {
+    opacity: 0;
+}
+
 .richPresenceItem .largeImage {
     width: 80px;
     height: 80px;
