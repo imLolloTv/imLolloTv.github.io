@@ -419,7 +419,28 @@ img[src=""] {
     flex-grow: 1;
     flex-shrink: 1;
     order: 0;
+    overflow: hidden;
     transition: 200ms;
+}
+
+.repo::after {
+    position: absolute;
+    right: -1.5rem;
+    top: 8px;
+    font: var(--fa-font-solid);
+    font-size: 6rem;
+    color: rgb(var(--mainColor));
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
+    opacity: 0.15;
+    z-index: -1;
+    transition: 500ms;
+}
+
+.repo:hover::after {
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
 }
 
 .repo.archived {
@@ -429,11 +450,19 @@ img[src=""] {
     order: 1;
 }
 
+.repo.archived::after {
+    content: "\f187";
+}
+
 .repo[name="imLolloTv.github.io"] {
     --mainColor: 146, 13, 255;
     box-shadow: inset 0 -10px 10px -10px rgb(var(--mainColor));
     
     order: -1;
+}
+
+.repo[name="imLolloTv.github.io"]::after {
+    content: "\f005";
 }
 
 .repo:hover {
