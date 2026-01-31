@@ -52,7 +52,7 @@ section {
     left: 0;
     flex-grow: 0;
     flex-shrink: 0;
-    transition: left 2s, right 2s;
+    transition: left 1.5s, right 1.5s;
 }
 
 main {

@@ -381,7 +381,10 @@ window.onload = async function() {
     });
 
     let currentIndex = 0;
+    currentSection = "main";
     let duringAnim = false;
+
+    let animTimeout = 0; // Old: 2000 
 
     document.querySelectorAll(".navRight").forEach((element) => {
         element.onclick = function(event) {
@@ -393,12 +396,13 @@ window.onload = async function() {
                 duringAnim = true;
                 setTimeout(() => {
                     duringAnim = false;
-                }, 2000)
+                }, animTimeout)
 
                 parent.style.left = `-${100 * (currentIndex + 1)}%`;
                 parent.nextElementSibling.style.left = `-${100 * (currentIndex + 1)}%`;
 
                 currentIndex += 1;
+                currentSection = parent.nextElementSibling.className;
             };
         };
     });
@@ -413,13 +417,67 @@ window.onload = async function() {
                 duringAnim = true;
                 setTimeout(() => {
                     duringAnim = false;
-                }, 2000)
+                }, animTimeout)
 
                 currentIndex -= 1;
+                currentSection = parent.previousElementSibling.className;
 
                 parent.style.left = `-${100 * (currentIndex)}%`;
                 parent.previousElementSibling.style.left = `-${100 * (currentIndex)}%`;
             };
         };
     });
+
+    document.addEventListener('touchstart', handleTouchStart, false);        
+    document.addEventListener('touchmove', handleTouchMove, false);
+
+    document.querySelector("video").addEventListener("pause", (event) => {
+        event.target.play();
+    });
 }
+
+// https://stackoverflow.com/questions/2264072/detect-a-finger-swipe-through-javascript-on-the-iphone-and-android
+
+var xDown = null;
+var yDown = null;
+
+function getTouches(evt) {
+    return evt.touches || /* browser API */ evt.originalEvent.touches; /* jQuery */
+}
+
+function handleTouchStart(evt) {
+    const firstTouch = getTouches(evt)[0];
+    xDown = firstTouch.clientX;
+    yDown = firstTouch.clientY;
+};
+
+function handleTouchMove(evt) {
+    if ( ! xDown || ! yDown ) {
+        return;
+    }
+
+    var xUp = evt.touches[0].clientX;
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) { /*most significant*/
+        if ( xDiff > 0 ) {
+            /* right swipe */ 
+            document.querySelector(`.${currentSection} .navRight`)?.onclick();
+        } else {
+            /* left swipe */
+            document.querySelector(`.${currentSection} .navLeft`)?.onclick();
+        }
+    } else {
+        if ( yDiff > 0 ) {
+            /* down swipe */ 
+        } else { 
+            /* up swipe */
+        }
+    }
+    /* reset values */
+    xDown = null;
+    yDown = null;
+};
