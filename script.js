@@ -146,34 +146,36 @@ function userActivity(userActivities, spotifyData) {
         userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
 
         userActivities.forEach((activity) => {
-            let image = getRichPresenceImage(activity?.assets?.large_image, {appId: activity.application_id});
+            if (activity?.application_id) {
+                let image = getRichPresenceImage(activity?.assets?.large_image, {appId: activity.application_id});
 
-            let element = document.createElement("div");
-            element.classList.add("richPresenceItem");
-            element.classList.add("standardActivity");
+                let element = document.createElement("div");
+                element.classList.add("richPresenceItem");
+                element.classList.add("standardActivity");
 
-            element.innerHTML = `
-                <img src="${image || ""}" alt="" class="largeImage">
-                <div class="text">
-                    <span class="name">${activity.name}</span>
-                    ${
-                        activity?.details && (
-                            `<span class="state">${activity?.details}</span>`
-                        ) || ""
-                    } 
-                    ${
-                        activity?.state && (
-                            `<span class="state">${activity?.state}</span>`
-                        ) || ""
-                    } 
-                    <span class="time" activity>
-                        <i class="fa-regular fa-clock"></i>
-                        <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">${getTimestamp(currentTimestamp, activity.timestamps?.start) || "0m 0s"}</span>
-                    </span>
-                </div>
-            `;
+                element.innerHTML = `
+                    <img src="${image || ""}" alt="" class="largeImage">
+                    <div class="text">
+                        <span class="name">${activity.name}</span>
+                        ${
+                            activity?.details && (
+                                `<span class="state">${activity?.details}</span>`
+                            ) || ""
+                        } 
+                        ${
+                            activity?.state && (
+                                `<span class="state">${activity?.state}</span>`
+                            ) || ""
+                        } 
+                        <span class="time" activity>
+                            <i class="fa-regular fa-clock"></i>
+                            <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">${getTimestamp(currentTimestamp, activity.timestamps?.start) || "0m 0s"}</span>
+                        </span>
+                    </div>
+                `;
 
-            $(".richPresenceContainer").prepend(element);
+                $(".richPresenceContainer").prepend(element);
+            };
         });
     };
 
