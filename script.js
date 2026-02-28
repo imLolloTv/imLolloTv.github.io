@@ -313,6 +313,32 @@ window.onload = async function() {
         // $(".alert").style.opacity = "1";
     };
 
+    const packagesResponse = await fetch("https://headless.tebex.io/api/accounts/ppxl-1feb21eff335afb074d73e9c154f57ecaa341d84/packages");
+
+    if (!packagesResponse.ok) {
+        console.log(packagesResponse)
+    } else {
+        const body = await packagesResponse.json();
+        
+        document.querySelector(".packagesContainer").innerHTML = "";
+        body.data.forEach(function(package) {
+            let element = document.createElement("div");
+            element.classList.add("package");
+            element.innerHTML = `
+                <img src="${package.image}">
+                <h3>${package.name}</h3>
+                <p>${package.currency} ${Number(package.total_price).toFixed(2)}</p>
+            `;
+            element.href = `https://imlollotv.tebex.io/package/${package.id}`;
+
+            // if (package.discount) {
+            //     element.classList.add("scontato");
+            // };
+
+            $(".packagesContainer").append(element);
+        });
+    };
+
     const repoResponse = await fetch("https://api.github.com/users/imlollotv/repos");
 
     if (!repoResponse.ok) {
@@ -375,7 +401,7 @@ window.onload = async function() {
         };
     }, 5000);
 
-    document.querySelectorAll("a, .repo").forEach((element) => {
+    document.querySelectorAll("a, .repo, .package").forEach((element) => {
         element.onclick = function(event) {
             event.preventDefault();
             window.open(this.href);
