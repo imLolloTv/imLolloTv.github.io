@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ImLolloTv</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome (per i link social) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* ─── RESET & VARS ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #07070d;
+      --card:     #0f0f1a;
+      --card2:    #13131f;
+      --border:   rgba(255,255,255,0.07);
+      --accent:   #7c5cfc;
+      --accent2:  #fc5c7d;
+      --text:     #e8e8f0;
+      --muted:    #6a6a82;
+      --online:   #23a55a;
+      --idle:     #f0b232;
+      --dnd:      #f23f43;
+      --offline:  #80848e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ─── VIDEO BACKGROUND ─────────────────────────────────────── */
+    #bgVideo {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    /* ─── NOISE + GRADIENT OVERLAY ─────────────────────────────── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%, rgba(124,92,252,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 85%, rgba(252,92,125,0.10) 0%, transparent 60%);
+    }
+    .overlay::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    /* ─── APP SHELL: HORIZONTAL SCROLL SECTIONS ────────────────── */
+    #appShell {
+      position: relative;
+      z-index: 2;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .section {
+      position: absolute;
+      top: 0; left: 100%;
+      width: 100%; height: 100%;
+      transition: left 0.45s cubic-bezier(0.4,0,0.2,1);
+      overflow-y: auto;
+      padding: 32px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* First section starts visible */
+    .section.main {
+      left: 0;
+    }
+
+    /* ─── NAV ARROWS ────────────────────────────────────────────── */
+    .navArrows {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .navBtn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(15,15,26,0.85);
+      backdrop-filter: blur(12px);
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .navBtn:hover { background: rgba(124,92,252,0.2); border-color: rgba(124,92,252,0.4); transform: scale(1.08); }
+    .navBtn.disabled { opacity: 0.25; pointer-events: none; }
+
+    .navDots {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .navDot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .navDot.active { background: var(--accent); transform: scale(1.4); }
+
+    /* ─── SECTION TITLES ────────────────────────────────────────── */
+    .sectionTitle {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 0.07em;
+      color: var(--text);
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sectionTitle::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── MAIN SECTION ──────────────────────────────────────────── */
+    .profileCard {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      backdrop-filter: blur(16px);
+      animation: fadeUp 0.6s ease both;
+    }
+
+    /* Avatar */
+    .avatarWrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .avatarRing {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent), var(--accent2), var(--accent));
+      animation: spin 4s linear infinite;
+      z-index: 0;
+    }
+    .avatarGlow {
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent), var(--accent2), var(--accent));
+      filter: blur(14px);
+      opacity: 0.5;
+      animation: spin 4s linear infinite;
+      z-index: -1;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .logo {
+      position: relative;
+      z-index: 1;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 3px solid var(--bg);
+      display: block;
+      object-fit: cover;
+      background: var(--card2);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .logo.loaded { opacity: 1; }
+    .avatarDecoration {
+      position: absolute;
+      z-index: 2;
+      width: 120px; height: 120px;
+      top: -10px; left: -10px;
+      pointer-events: none;
+    }
+
+    /* Status dot on avatar */
+    .statusDot {
+      position: absolute;
+      z-index: 3;
+      bottom: 4px; right: 4px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 3px solid var(--card);
+      background: var(--offline);
+      transition: background 0.3s;
+    }
+    .statusDot.online  { background: var(--online); }
+    .statusDot.idle    { background: var(--idle); }
+    .statusDot.dnd     { background: var(--dnd); }
+    .statusDot.offline { background: var(--offline); }
+
+    /* Name */
+    .profileName {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #fff 20%, rgba(124,92,252,0.95));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.05;
+      text-align: center;
+    }
+
+    .profileUsername {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Badge flags */
+    .flagContainer {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .flagContainer span {
+      width: 24px; height: 24px;
+      display: inline-block;
+      cursor: default;
+      position: relative;
+    }
+    .flagContainer span::after {
+      content: attr(label);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .flagContainer span:hover::after { opacity: 1; }
+
+    /* Discord button */
+    .discordBtn {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 22px;
+      border-radius: 10px;
+      background: rgba(88,101,242,0.15);
+      border: 1px solid rgba(88,101,242,0.35);
+      color: #7289da;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .discordBtn:hover { background: rgba(88,101,242,0.28); transform: translateY(-2px); }
+
+    /* Social links */
+    .linksRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .link {
+      position: relative;
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text);
+      font-size: 15px;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .link:hover {
+      background: rgba(124,92,252,0.18);
+      border-color: rgba(124,92,252,0.4);
+      transform: translateY(-2px);
+    }
+    .link::after {
+      content: attr(label);
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+    .link:hover::after { opacity: 1; }
+
+    /* ─── RICH PRESENCE ─────────────────────────────────────────── */
+    .richPresenceContainer {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .richPresenceItem {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      animation: fadeUp 0.4s ease both;
+      transition: border-color 0.25s;
+    }
+    .richPresenceItem:hover { border-color: rgba(124,92,252,0.3); }
+
+    .richPresenceItem .largeImage {
+      width: 56px; height: 56px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .richPresenceItem .text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .richPresenceItem .name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .richPresenceItem .details,
+    .richPresenceItem .state {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .richPresenceItem .time {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: rgba(124,92,252,0.9);
+      margin-top: 2px;
+    }
+
+    /* Spotify bar */
+    .richPresenceItem .status[activitySpotify] {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .richPresenceItem .status span {
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .richPresenceItem .bar {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .richPresenceItem .bar div {
+      height: 100%;
+      background: #1db954;
+      border-radius: 99px;
+      transition: width 0.5s linear;
+    }
+
+    /* ─── PACKAGES SECTION ──────────────────────────────────────── */
+    .packagesContainer {
+      width: 100%;
+      max-width: 540px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .package {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .package:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,92,252,0.35);
+      box-shadow: 0 8px 28px rgba(124,92,252,0.14);
+    }
+    .package img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: var(--card2);
+    }
+    .package h3 {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 14px 4px;
+      color: var(--text);
+    }
+    .package p {
+      font-size: 13px;
+      padding: 0 14px 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── REPOS SECTION ─────────────────────────────────────────── */
+    .repoContainer {
+      width: 100%;
+      max-width: 540px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .repo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .repo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124,92,252,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .repo:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,92,252,0.35);
+      box-shadow: 0 8px 28px rgba(124,92,252,0.12);
+    }
+    .repo:hover::before { opacity: 1; }
+    .repo.archived { opacity: 0.5; }
+    .repo h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .repo h3 .archiveBadge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(240,178,50,0.12);
+      border: 1px solid rgba(240,178,50,0.25);
+      color: #f0b232;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+    }
+    .repo p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ─── LOADING SPINNER ───────────────────────────────────────── */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 40px;
+      color: var(--muted);
+      font-size: 13px;
+      transition: opacity 0.4s, margin-top 0.4s;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: rotate 0.8s linear infinite;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+
+    /* ─── EMPTY / ERROR ─────────────────────────────────────────── */
+    .emptyState {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 40px;
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 540px;
+    }
+    .emptyState .emoji { font-size: 28px; }
+
+    /* ─── FOOTER ────────────────────────────────────────────────── */
+    .pageFooter {
+      margin-top: auto;
+      padding-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .pageFooter a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .pageFooter a:hover { opacity: 0.75; }
+
+    /* ─── ANIMATIONS ────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── SCROLLBAR ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(124,92,252,0.3); border-radius: 2px; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .profileCard { padding: 24px 18px 20px; }
+      .packagesContainer, .repoContainer { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- VIDEO BG -->
+<video id="bgVideo" src="./assets/video/background.mp4" autoplay muted loop playsinline></video>
+<div class="overlay"></div>
+
+<!-- APP SHELL -->
+<div id="appShell">
+
+  <!-- ── SECTION 1: PROFILO ── -->
+  <div class="section main">
+    <div class="profileCard">
+      <div class="avatarWrap">
+        <div class="avatarGlow"></div>
+        <div class="avatarRing"></div>
+        <img class="logo" src="./assets/img/logo.png" alt="avatar" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')" />
+        <img class="avatarDecoration" src="" alt="" />
+        <span class="statusDot offline" id="statusDot"></span>
+      </div>
+
+      <h1 class="profileName">Lollo</h1>
+      <p class="profileUsername">imlollotv</p>
+
+      <div class="flagContainer"></div>
+
+      <button class="discordBtn" id="apriProfilo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.081.114 18.104.133 18.119a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+        </svg>
+        Vedi su Discord
+      </button>
+
+      <div class="links linksRow"></div>
+
+      <div class="richPresenceContainer"></div>
+
+    </div>
+
+    <div class="pageFooter">
+      <a href="https://github.com/imLolloTv/imLolloTv.github.io" target="_blank">Source code</a>
+      &nbsp;·&nbsp;
+      Made with ❤️ by <a href="https://imlollotv.github.io/">ImLolloTv</a>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: TEBEX ── -->
+  <div class="section tebex" style="left:100%">
+    <div class="sectionTitle">🛒 Tebex Packages</div>
+    <div class="packagesContainer" id="packagesContainer">
+      <div class="loading" id="tebexLoading">
+        <div class="spinner"></div>
+        <span>Caricamento pacchetti…</span>
+      </div>
+    </div>
+    <div class="pageFooter">Made with ❤️ by <a href="https://imlollotv.github.io/">ImLolloTv</a></div>
+  </div>
+
+  <!-- ── SECTION 3: REPOS ── -->
+  <div class="section repos" style="left:100%">
+    <div class="sectionTitle">📦 Repositories</div>
+    <div class="repoContainer" id="repoContainer">
+      <div class="loading" id="repoLoading">
+        <div class="spinner"></div>
+        <span>Caricamento repository…</span>
+      </div>
+    </div>
+    <div class="pageFooter">Made with ❤️ by <a href="https://imlollotv.github.io/">ImLolloTv</a></div>
+  </div>
+
+</div><!-- /appShell -->
+
+<!-- NAV ARROWS -->
+<nav class="navArrows nav" id="navArrows">
+  <button class="navBtn" id="navLeft" disabled>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="navDots">
+    <div class="navDot active" data-index="0"></div>
+    <div class="navDot" data-index="1"></div>
+    <div class="navDot" data-index="2"></div>
+  </div>
+  <button class="navBtn" id="navRight">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</nav>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   CONFIG
+───────────────────────────────────────────────────────────── */
+const userId = "623496189056253953";
+const TEBEX_TOKEN = "ppxl-1feb21eff335afb074d73e9c154f57ecaa341d84";
+
+const validFlags = [
+  { id:"HYPESQUAD_ONLINE_HOUSE_1", img:"https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/hypesquadbravery.svg",   label:"Hypesquad Bravery" },
+  { id:"HYPESQUAD_ONLINE_HOUSE_2", img:"https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/hypesquadbrilliance.svg", label:"Hypesquad Brilliance" },
+  { id:"HYPESQUAD_ONLINE_HOUSE_3", img:"https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/hypesquadbalance.svg",    label:"Hypesquad Balance" },
+  { id:"ACTIVE_DEVELOPER",         img:"https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/activedeveloper.svg",     label:"Sviluppatore attivo" },
+];
+
+const links = [
+  { icon:"fa-brands fa-steam",       link:"https://steamcommunity.com/id/imlollotv/",                 label:"Steam" },
+  { icon:"fa-brands fa-instagram",   link:"https://www.instagram.com/n.loreee",                       label:"Instagram" },
+  { icon:"fa-brands fa-spotify",     link:"https://open.spotify.com/user/zsevit1zzx7k35va3b45uiy9t", label:"Spotify" },
+  { icon:"fa-brands fa-tiktok",      link:"https://www.tiktok.com/@n.loreee",                         label:"TikTok" },
+  { icon:"fa-solid fa-chart-simple", link:"https://stats.fm/n.loreee",                                label:"Stats.fm" },
+  { icon:"fa-brands fa-twitch",      link:"https://www.twitch.tv/imLolloTv",                          label:"Twitch" },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   HELPERS – exact logic from original script.js
+───────────────────────────────────────────────────────────── */
+let detectableApps = null;
+
+function calculateFlags(flagNumber, flags) {
+  flagNumber = BigInt(flagNumber);
+  let results = [];
+  for (let i = 0; i <= 64; i++) {
+    const bitwise = 1n << BigInt(i);
+    if (flagNumber & bitwise) {
+      const flag = Object.entries(flags).find(f => f[1].shift === i)?.[0] || `UNKNOWN_FLAG_${i}`;
+      results[flag] = true;
+    }
+  }
+  return results;
+}
+
+function getRichPresenceImage(input, options = {}) {
+  const { appId = null, ext = "png" } = options;
+  if (input && input.startsWith("mp:external/")) {
+    const parts = input.replace("mp:external/", "").split("/");
+    const httpIndex = parts.findIndex(p => p.startsWith("http") || p.startsWith("https"));
+    if (httpIndex !== -1) {
+      return parts.slice(httpIndex).join("/").replace(/^https\//, "https://").replace(/^http\//, "http://");
+    }
+  }
+  if (input && /^\d{17,19}$/.test(input) && appId) {
+    return `https://cdn.discordapp.com/app-assets/${appId}/${input}.${ext}`;
+  }
+  if (appId && detectableApps) {
+    for (const app of detectableApps) {
+      if (app.id == appId) return `https://cdn.discordapp.com/app-icons/${appId}/${app.icon_hash}.${ext}`;
+    }
+  }
+  return "./assets/img/placeholder.png";
+}
+
+function getTimestamp(currentTs, startTs) {
+  let diff = currentTs - startTs;
+  let s = Math.floor(diff / 1000);
+  let m = Math.floor(s / 60);
+  let h = Math.floor(m / 60);
+  let d = Math.floor(h / 24);
+  s %= 60; m %= 60; h %= 24;
+  return `${d > 0 ? d+"g " : ""}${h > 0 ? h+"h " : ""}${m || 0}m ${s || 0}s`;
+}
+
+function getSpotifyTimestamp(current, start, end) {
+  const duration = end - start;
+  const elapsed  = current - start;
+  let ds = Math.floor(duration / 1000), dm = Math.floor(ds / 60);
+  let es = Math.floor(elapsed  / 1000), em = Math.floor(es / 60);
+  ds %= 60; es %= 60;
+  return {
+    elapsed:  `${String(em).padStart(2,"0")}:${String(es).padStart(2,"0")}`,
+    duration: `${String(dm).padStart(2,"0")}:${String(ds).padStart(2,"0")}`,
+    perc: Math.floor((elapsed / duration) * 100)
+  };
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ACTIVITY RENDERER
+───────────────────────────────────────────────────────────── */
+function userActivity(userActivities, spotifyData) {
+  const container = document.querySelector(".richPresenceContainer");
+  container.querySelectorAll(".standardActivity").forEach(el => el.remove());
+
+  const currentTs = Date.now();
+
+  if (userActivities && userActivities.length > 0) {
+    userActivities = userActivities.filter(a => !a.id.startsWith("spotify:"));
+    userActivities.forEach(activity => {
+      if (activity?.application_id) {
+        const image = getRichPresenceImage(activity?.assets?.large_image, { appId: activity.application_id });
+        const el = document.createElement("div");
+        el.classList.add("richPresenceItem", "standardActivity");
+        el.innerHTML = `
+          <img src="${image || ""}" alt="" class="largeImage"
+               onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect width=%2256%22 height=%2256%22 rx=%2210%22 fill=%22%23ffffff08%22/><text x=%2228%22 y=%2237%22 text-anchor=%22middle%22 font-size=%2224%22>🎮</text></svg>'">
+          <div class="text">
+            <span class="name">${activity.name}</span>
+            ${activity?.details ? `<span class="state">${activity.details}</span>` : ""}
+            ${activity?.state   ? `<span class="state">${activity.state}</span>`   : ""}
+            <span class="time" activity>
+              <i class="fa-regular fa-clock"></i>
+              <span id="${activity?.id}" data-timestampStart="${activity.timestamps?.start}">
+                ${getTimestamp(currentTs, activity.timestamps?.start) || "0m 0s"}
+              </span>
+            </span>
+          </div>`;
+        container.prepend(el);
+      }
+    });
+  }
+
+  const currentSpotifyTitle = container.querySelector(".spotifyTitle")?.textContent;
+  if (spotifyData && spotifyData.song !== currentSpotifyTitle) {
+    container.querySelector(".spotifyActivity")?.remove();
+    const data = getSpotifyTimestamp(currentTs, spotifyData?.timestamps?.start, spotifyData?.timestamps?.end);
+    const el = document.createElement("div");
+    el.classList.add("richPresenceItem", "spotifyActivity");
+    el.innerHTML = `
+      <img src="${spotifyData.album_art_url}" alt="" class="largeImage"
+           onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect width=%2256%22 height=%2256%22 rx=%2210%22 fill=%22%231db95420%22/><text x=%2228%22 y=%2237%22 text-anchor=%22middle%22 font-size=%2224%22>🎵</text></svg>'">
+      <div class="text">
+        <span class="name spotifyTitle">${spotifyData.song}</span>
+        <span class="details">${spotifyData.artist}</span>
+        <div class="status" activitySpotify
+             data-start="${spotifyData?.timestamps?.start}"
+             data-end="${spotifyData?.timestamps?.end}">
+          <span activitySpotifyElapsed>${data.elapsed || "00:00"}</span>
+          <div class="bar"><div activitySpotifyBar style="width:${data.perc || 0}%"></div></div>
+          <span activitySpotifyDuration>${data.duration || "00:00"}</span>
+        </div>
+      </div>`;
+    container.append(el);
+  } else if (!spotifyData) {
+    container.querySelector(".spotifyActivity")?.remove();
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MAIN INIT
+───────────────────────────────────────────────────────────── */
+window.onload = async function () {
+  /* ── LANYARD ── */
+  try {
+    const [lanyardRes, flagsRes, appsRes] = await Promise.all([
+      fetch(`https://api.lanyard.rest/v1/users/${userId}`),
+      fetch("https://flags.lewisakura.moe/flags/user.json"),
+      fetch("https://discord.com/api/v9/applications/detectable")
+    ]);
+
+    const _userFlags   = flagsRes.ok ? await flagsRes.json() : {};
+    detectableApps     = appsRes.ok  ? await appsRes.json()  : [];
+
+    if (lanyardRes.ok) {
+      const body = await lanyardRes.json();
+      const userData      = body.data.discord_user;
+      const userActivities = body.data.activities;
+      const spotifyData   = body.data?.spotify;
+      const discordStatus = body.data?.discord_status;
+      const discordId     = userData.id;
+
+      /* Avatar */
+      let avatarUrl;
+      if (userData.avatar?.startsWith("a_")) {
+        avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.gif`;
+      } else if (userData.avatar) {
+        avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.png`;
+      } else {
+        const idx = userData.discriminator === 0 || userData.discriminator === "0"
+          ? (BigInt(discordId) >> 22n) % 6n
+          : userData.discriminator % 5;
+        avatarUrl = `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
+      }
+      const logoEl = document.querySelector(".logo");
+      logoEl.classList.remove("loaded");
+      const tempImg = new Image();
+      tempImg.onload = () => { logoEl.src = avatarUrl; logoEl.classList.add("loaded"); };
+      tempImg.onerror = () => { logoEl.src = avatarUrl; logoEl.classList.add("loaded"); };
+      tempImg.src = avatarUrl;
+
+      /* Avatar decoration */
+      if (userData?.avatar_decoration_data?.asset) {
+        document.querySelector(".avatarDecoration").src =
+          `https://cdn.discordapp.com/avatar-decoration-presets/${userData.avatar_decoration_data.asset}.png`;
+      }
+
+      /* Name */
+      document.querySelector(".profileName").textContent = userData.global_name || userData.username;
+      document.querySelector(".profileUsername").textContent = userData.username;
+      document.title = `${userData.global_name || userData.username} (@${userData.username})`;
+
+      /* Status dot */
+      const dot = document.getElementById("statusDot");
+      dot.className = `statusDot ${discordStatus || "offline"}`;
+
+      /* Flags */
+      const userFlags = calculateFlags(userData.public_flags, _userFlags);
+      const flagContainer = document.querySelector(".flagContainer");
+      validFlags.forEach(flagData => {
+        if (userFlags[flagData.id]) {
+          const el = document.createElement("span");
+          el.style.cssText = `background-image:url(${flagData.img});background-repeat:no-repeat;background-size:cover;`;
+          el.setAttribute("label", flagData.label);
+          flagContainer.append(el);
+        }
+      });
+
+      /* Social links */
+      const linksEl = document.querySelector(".links");
+      links.forEach(l => {
+        const a = document.createElement("a");
+        a.classList.add("styled","link");
+        a.href = l.link;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.setAttribute("label", l.label);
+        a.innerHTML = `<i class="${l.icon}"></i>`;
+        linksEl.append(a);
+      });
+
+      /* Discord profile button */
+      document.getElementById("apriProfilo").onclick = () => window.open(`https://discord.com/users/${discordId}`);
+
+      /* Activities */
+      userActivity(userActivities, spotifyData);
+    }
+  } catch(e) {
+    console.warn("Lanyard error:", e);
+  }
+
+  /* ── TEBEX ── */
+  try {
+    const pkgRes = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_TOKEN}/packages`);
+    const pkgContainer = document.getElementById("packagesContainer");
+    document.getElementById("tebexLoading")?.remove();
+
+    if (pkgRes.ok) {
+      const body = await pkgRes.json();
+      if (!body.data?.length) throw new Error("empty");
+      body.data.forEach(pkg => {
+        const el = document.createElement("div");
+        el.classList.add("package");
+        el.href = `https://imlollotv.tebex.io/package/${pkg.id}`;
+        el.innerHTML = `
+          <img src="${pkg.image || ""}" alt="${pkg.name}"
+               onerror="this.style.display='none'">
+          <h3>${pkg.name}</h3>
+          <p>${pkg.currency} ${Number(pkg.total_price).toFixed(2)}</p>`;
+        pkgContainer.append(el);
+      });
+    } else throw new Error("api");
+  } catch {
+    const pkgContainer = document.getElementById("packagesContainer");
+    document.getElementById("tebexLoading")?.remove();
+    pkgContainer.innerHTML = `<div class="emptyState"><span class="emoji">🥲</span>Le API non hanno risposto</div>`;
+  }
+
+  /* ── GITHUB REPOS ── */
+  try {
+    const repoRes = await fetch("https://api.github.com/users/imlollotv/repos");
+    const repoContainer = document.getElementById("repoContainer");
+    document.getElementById("repoLoading")?.remove();
+
+    if (repoRes.ok) {
+      const body = await repoRes.json();
+      if (!body.length) throw new Error("empty");
+      body.forEach(repo => {
+        const el = document.createElement("div");
+        el.classList.add("repo");
+        el.href = repo.html_url;
+        if (repo.archived) el.classList.add("archived");
+        el.setAttribute("name", repo.name);
+        el.innerHTML = `
+          <h3>${repo.name}${repo.archived ? '<span class="archiveBadge">archiviato</span>' : ""}</h3>
+          <p>${repo.description || ""}</p>`;
+        repoContainer.append(el);
+      });
+    } else throw new Error("api");
+  } catch {
+    const repoContainer = document.getElementById("repoContainer");
+    document.getElementById("repoLoading")?.remove();
+    repoContainer.innerHTML = `<div class="emptyState"><span class="emoji">🥲</span>Le API non hanno risposto</div>`;
+  }
+
+  /* ── TIMERS ── */
+
+  // Activity timestamp tick
+  setInterval(() => {
+    const currentTs = Date.now();
+    document.querySelectorAll("[activity] span").forEach(el => {
+      const start = parseInt(el.getAttribute("data-timestampStart"), 10);
+      el.textContent = getTimestamp(currentTs, start) || "0m 0s";
+    });
+    const spotEl = document.querySelector("[activitySpotify]");
+    if (spotEl) {
+      const data = getSpotifyTimestamp(currentTs, spotEl.getAttribute("data-start"), spotEl.getAttribute("data-end"));
+      if (data.perc < 100) {
+        document.querySelector("[activitySpotifyElapsed]").textContent  = data.elapsed  || "00:00";
+        document.querySelector("[activitySpotifyBar]").style.width      = `${data.perc || 0}%`;
+        document.querySelector("[activitySpotifyDuration]").textContent = data.duration || "00:00";
+      }
+    }
+  }, 500);
+
+  // Lanyard polling
+  setInterval(async () => {
+    try {
+      const res = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
+      if (!res.ok) return;
+      const body = await res.json();
+      userActivity(body.data.activities, body.data?.spotify);
+      // update status dot
+      const dot = document.getElementById("statusDot");
+      if (dot) dot.className = `statusDot ${body.data?.discord_status || "offline"}`;
+    } catch {}
+  }, 5000);
+
+  /* ── CLICK HANDLERS (links + cards) ── */
+  document.addEventListener("click", e => {
+    const target = e.target.closest("a, .repo, .package");
+    if (!target) return;
+    const href = target.href || target.getAttribute("href");
+    if (href && !href.startsWith("javascript")) {
+      e.preventDefault();
+      window.open(href, "_blank");
+    }
+  });
+
+  /* ── VIDEO RESUME ── */
+  const video = document.querySelector("video");
+  if (video) video.addEventListener("pause", () => video.play());
+};
+
+/* ─────────────────────────────────────────────────────────────
+   NAVIGATION
+───────────────────────────────────────────────────────────── */
+const sections = Array.from(document.querySelectorAll(".section"));
+const navLeft  = document.getElementById("navLeft");
+const navRight = document.getElementById("navRight");
+const dots     = Array.from(document.querySelectorAll(".navDot"));
+let currentIndex = 0;
+let duringAnim = false;
+const ANIM_DELAY = 0; // ms lockout (original: 0)
+
+function goTo(newIndex) {
+  if (duringAnim) return;
+  if (newIndex < 0 || newIndex >= sections.length) return;
+
+  const dir = newIndex > currentIndex ? 1 : -1;
+
+  sections[currentIndex].style.left = `${-dir * 100}%`;
+  sections[newIndex].style.left = "0%";
+
+  currentIndex = newIndex;
+
+  dots.forEach((d, i) => d.classList.toggle("active", i === currentIndex));
+  navLeft.disabled  = currentIndex === 0;
+  navRight.disabled = currentIndex === sections.length - 1;
+
+  if (ANIM_DELAY) {
+    duringAnim = true;
+    setTimeout(() => { duringAnim = false; }, ANIM_DELAY);
+  }
+}
+
+navLeft.addEventListener("click",  () => goTo(currentIndex - 1));
+navRight.addEventListener("click", () => goTo(currentIndex + 1));
+dots.forEach(d => d.addEventListener("click", () => goTo(+d.dataset.index)));
+
+// Initial state
+navLeft.disabled = true;
+
+/* ─── TOUCH / SWIPE ──────────────────────────────────────── */
+let xDown = null, yDown = null;
+
+document.addEventListener("touchstart", e => {
+  xDown = e.touches[0].clientX;
+  yDown = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener("touchmove", e => {
+  if (!xDown || !yDown) return;
+  const xDiff = xDown - e.touches[0].clientX;
+  const yDiff = yDown - e.touches[0].clientY;
+  if (Math.abs(xDiff) > Math.abs(yDiff)) {
+    if (xDiff > 0) goTo(currentIndex + 1);
+    else           goTo(currentIndex - 1);
+  }
+  xDown = null; yDown = null;
+}, { passive: true });
+</script>
+</body>
+</html>
