@@ -179,9 +179,14 @@ function userActivity(userActivities, spotifyData) {
         });
     };
 
-    let currentSpotifyTitle = $(".spotifyTitle")?.textContent;
+    let currentSpotifyTitle = $(".spotifyActivity .name")?.textContent;
+    let currentSpotifyStart = $("[activitySpotify]")?.getAttribute("data-start");
+    let currentSpotifyEnd = $("[activitySpotify]")?.getAttribute("data-end");
 
-    if (spotifyData && spotifyData.song != currentSpotifyTitle) {
+    if (
+        spotifyData &&
+        (spotifyData.song != currentSpotifyTitle || spotifyData?.timestamps?.start != currentSpotifyStart || spotifyData?.timestamps?.end != currentSpotifyEnd)
+    ) {
         $(".spotifyActivity")?.remove();
 
         let data = getSpotifyTimestamp(currentTimestamp, spotifyData?.timestamps?.start, spotifyData?.timestamps?.end);
@@ -191,9 +196,11 @@ function userActivity(userActivities, spotifyData) {
         element.classList.add("spotifyActivity");
 
         element.innerHTML = `
-            <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
+            <div class="vinyl">
+                <img src="${spotifyData.album_art_url}" alt="" class="largeImage">
+            </div>
             <div class="text">
-                <span class="name spotifyTitle">${spotifyData.song}</span>
+                <span class="name">${spotifyData.song}</span>
                 <span class="details">${spotifyData.artist}</span>
                 <div class="status" activitySpotify data-start="${spotifyData?.timestamps?.start}" data-end="${spotifyData?.timestamps?.end}">
                     <span activitySpotifyElapsed>${data.elapsed || "00:00"}</span>
@@ -217,101 +224,110 @@ window.onload = async function() {
         element.classList.add("disabled");
     });
 
-    const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
-
     const __userFlags = await fetch(`https://flags.lewisakura.moe/flags/user.json`);
     const _userFlags = await __userFlags.json();
-
-    // const __applicationFlags = await fetch(`https://flags.lewisakura.moe/flags/application.json`);
-    // const _applicationFlags = await __applicationFlags.json();
 
     const _detectableApps = await fetch("https://discord.com/api/v9/applications/detectable");
     detectableApps = await _detectableApps.json();
 
-    if (!response.ok) {
-        console.log(response)
-    } else {
-        const body = await response.json();
+    const socket = new WebSocket("wss://api.lanyard.rest/socket");
+    socket.onopen = () => {
+        socket.send(JSON.stringify({ op: 2, d: { subscribe_to_id: userId } }));
+    };
 
-        let userData = body.data.discord_user;
-        let userActivities = body.data.activities;
-        let spotifyData = body.data?.spotify;
+    socket.addEventListener("message", (event) => {
+        const msg = JSON.parse(event.data);
 
-        let discordId = userData.id;
-
-        let immagine, avatarDecoration;
-
-        if (userData.avatar && userData.avatar.startsWith("a_")) {
-            immagine = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.gif`;
-        } else if (userData.avatar) {
-            immagine = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.png`;
-        } else {
-            if (userData.discriminator === 0 || userData.discriminator === "0") {
-                immagine = `https://cdn.discordapp.com/embed/avatars/${((discordId >> 22) % 6)}.png`;
-            } else {
-                immagine = `https://cdn.discordapp.com/embed/avatars/${(userData.discriminator % 5)}.png`;
-            }
-        };
-
-        if (userData?.avatar_decoration_data?.asset) {
-            avatarDecoration = `https://cdn.discordapp.com/avatar-decoration-presets/${userData?.avatar_decoration_data?.asset}.png`
+        if (msg.op === 1) {
+            heartbeatInterval = setInterval(() => {
+                if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ op: 3 }));
+            }, msg.d.heartbeat_interval);
         }
 
-        $(".logo").src = immagine;
-        $(".avatarDecoration").src = avatarDecoration || "";
+        if (msg.op === 0) {
+            const body = msg.d;
+            if (msg.t === 'INIT_STATE' || msg.t === 'PRESENCE_UPDATE') {
+                console.log(body)
 
-        $("h1").innerHTML = userData.global_name;
-        $("h4").innerHTML = userData.username;
+                let userData = body.discord_user;
+                let userActivities = body.activities;
+                let spotifyData = body?.spotify;
 
-        document.title = `${userData.global_name} (@${userData.username})`
+                let discordId = userData.id;
 
-        links.forEach((link) => {
-            let element = document.createElement("a");
-            element.classList.add("styled")
-            element.classList.add("link")
-            element.href = link.link;
-            element.setAttribute("label", link.label)
+                let immagine, avatarDecoration;
 
-            element.innerHTML = `
-                <i class="${link.icon}"></i>
-            `;
+                if (userData.avatar && userData.avatar.startsWith("a_")) {
+                    immagine = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.gif`;
+                } else if (userData.avatar) {
+                    immagine = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.png`;
+                } else {
+                    if (userData.discriminator === 0 || userData.discriminator === "0") {
+                        immagine = `https://cdn.discordapp.com/embed/avatars/${((discordId >> 22) % 6)}.png`;
+                    } else {
+                        immagine = `https://cdn.discordapp.com/embed/avatars/${(userData.discriminator % 5)}.png`;
+                    }
+                };
 
-            $(".links").append(element);
-        })
+                if (userData?.avatar_decoration_data?.asset) {
+                    avatarDecoration = `https://cdn.discordapp.com/avatar-decoration-presets/${userData?.avatar_decoration_data?.asset}.png`
+                }
 
-        $("main").style.marginTop = "unset";
-        $("main").style.opacity = "1";
+                $(".logo").src = immagine;
+                $(".avatarDecoration").src = avatarDecoration || "";
 
-        let userFlags = calculateFlags(userData.public_flags, _userFlags);
-        // let applicationFlags = calculateFlags(userData.public_flags, _applicationFlags);
+                $("h1").innerHTML = userData.global_name;
+                $("h4").innerHTML = userData.username;
 
-        validFlags.forEach((flagData) => {
-            if (userFlags[flagData.id]) {
-                let element = document.createElement("span");
-                element.style.backgroundImage = `url(${flagData.img})`;
-                element.style.backgroundRepeat = "no-repeat";
-                element.style.backgroundSize = "cover";
-                element.setAttribute("label", flagData.label);
+                document.title = `${userData.global_name} (@${userData.username})`
 
-                $(".flagContainer").append(element);
+                $("main").style.marginTop = "unset";
+                $("main").style.opacity = "1";
+
+                let userFlags = calculateFlags(userData.public_flags, _userFlags);
+
+                $(".flagContainer").innerHTML = "";
+                validFlags.forEach((flagData) => {
+                    if (userFlags[flagData.id]) {
+                        let element = document.createElement("span");
+                        element.style.backgroundImage = `url(${flagData.img})`;
+                        element.style.backgroundRepeat = "no-repeat";
+                        element.style.backgroundSize = "cover";
+                        element.setAttribute("label", flagData.label);
+
+                        $(".flagContainer").append(element);
+                    }
+                })
+
+                userActivity(userActivities, spotifyData);
+
+                $(".loading").style.marginTop = "200px";
+                $(".loading").style.opacity = "0";
+
+                $("#apriProfilo").onclick = function() {
+                    window.open(`https://discord.com/users/${discordId}`);
+                };
+
+                document.querySelectorAll(".nav").forEach((element) => {
+                    element.classList.remove("disabled");
+                });
             }
-        })
+        }
+    });
 
-        userActivity(userActivities, spotifyData);
+    links.forEach((link) => {
+        let element = document.createElement("a");
+        element.classList.add("styled")
+        element.classList.add("link")
+        element.href = link.link;
+        element.setAttribute("label", link.label)
 
-        $(".loading").style.marginTop = "200px";
-        $(".loading").style.opacity = "0";
+        element.innerHTML = `
+            <i class="${link.icon}"></i>
+        `;
 
-        $("#apriProfilo").onclick = function() {
-            window.open(`https://discord.com/users/${discordId}`);
-        };
-
-        document.querySelectorAll(".nav").forEach((element) => {
-            element.classList.remove("disabled");
-        });
-
-        // $(".alert").style.opacity = "1";
-    };
+        $(".links").append(element);
+    });
 
     const packagesResponse = await fetch("https://headless.tebex.io/api/accounts/ppxl-1feb21eff335afb074d73e9c154f57ecaa341d84/packages");
 
@@ -385,21 +401,6 @@ window.onload = async function() {
             };
         }
     }, 500);
-
-    setInterval(async () => {
-        const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
-
-        if (!response.ok) {
-            console.log(response)
-        } else {
-            const body = await response.json();
-    
-            let userActivities = body.data.activities;
-            let spotifyData = body.data?.spotify;
-    
-            userActivity(userActivities, spotifyData);
-        };
-    }, 5000);
 
     document.querySelectorAll("a, .repo, .package").forEach((element) => {
         element.onclick = function(event) {

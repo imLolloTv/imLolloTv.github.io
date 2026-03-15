@@ -1,6 +1,10 @@
 :root {
     --_mainColor: 255, 255, 255;
     --mainColor: 255, 255, 255;
+
+    /* --font: 'Unbounded', sans-serif; */
+    --font: 'Syne', sans-serif;
+    --alternativeFont: 'DM Sans', sans-serif;
 }
 
 body {
@@ -70,7 +74,7 @@ main {
     border: 1px solid rgba(var(--mainColor), 0.2);
     border-radius: 15px;
     color: rgb(var(--mainColor));
-    font-family: 'Unbounded', sans-serif;
+    font-family: var(--font);
     text-align: center;
     /* ANIMAZIONE */
     margin-top: -50px;
@@ -137,7 +141,7 @@ main {
     border: 1px solid rgba(240, 200, 0, 0.6);
     border-radius: 15px;
     color: rgb(240, 200, 0);
-    font-family: 'Unbounded', sans-serif;
+    font-family: var(--font);
     /* ANIMAZIONE */
     opacity: 0;
     transition: 500ms;
@@ -157,6 +161,10 @@ main {
 
 .avatarDecoration[src=""] {
     display: none;
+}
+
+h1, h2, h4 {
+    font-weight: 750;
 }
 
 h1, h2 {
@@ -221,7 +229,7 @@ button, a.styled {
     border-radius: 15px;
     outline: none;
     color: white;
-    font-family: 'Unbounded', sans-serif;
+    font-family: var(--font);
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     transition: 200ms;
@@ -354,20 +362,18 @@ img[src=""] {
     text-overflow: ellipsis;
 }
 
-.richPresenceItem .text .time {
+.richPresenceItem .name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.richPresenceItem .time {
     margin-top: 1%;
     color: rgb(93, 255, 93);
 }
 
-.spotifyTitle {
-    overflow: unset!important;
-    white-space: unset!important;
-    text-overflow: unset!important;
-}
-
-.richPresenceItem .name {
-    font-weight: 600;
-    font-size: 1rem;
+.richPresenceItem .status, .richPresenceItem .time {
+    font-family: var(--alternativeFont);
 }
 
 .richPresenceItem .status {
@@ -378,7 +384,8 @@ img[src=""] {
 }
 
 .richPresenceItem .status > span {
-    width: 2.7rem;
+    width: 2.2rem;
+    font-weight: 500;
 }
 
 .richPresenceItem .status .bar {
@@ -394,6 +401,37 @@ img[src=""] {
     background-color: rgba(var(--mainColor), 0.2);
     height: 100%;
     transition: width 1s linear;
+}
+
+.vinyl {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.vinyl .largeImage {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    animation: spin 10s linear infinite;
+    -webkit-mask-image: radial-gradient(circle, transparent 0 13px, black 14px 100%);
+    mask-image: radial-gradient(circle, transparent 0 13px, black 14px 100%);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.spotifyActivity .name {
+    overflow: unset!important;
+    white-space: unset!important;
+    text-overflow: unset!important;
+    font-weight: 730;
+}
+
+.spotifyActivity .details {
+    opacity: 0.8;
 }
 
 .packagesContainer {
@@ -439,6 +477,7 @@ img[src=""] {
 }
 
 .package p {
+    font-family: var(--alternativeFont);
     font-size: 0.8rem;
 }
 
@@ -572,7 +611,7 @@ p {
     bottom: 15px;
     padding: unset!important;
     border-radius: 50px!important;
-    font-family: 'Unbounded', sans-serif;
+    font-family: var(--font);
     align-items: center;
     cursor: pointer;
     transition: 200ms;
@@ -618,7 +657,7 @@ p {
     transform: translateX(-50%);
     color: white;
     font-size: 10px;
-    font-family: 'Unbounded', sans-serif;
+    font-family: var(--font);
     opacity: 0.05;
     transition: 500ms;
 }
