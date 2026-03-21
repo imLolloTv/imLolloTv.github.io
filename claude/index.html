@@ -618,7 +618,7 @@
 <body>
 
 <!-- VIDEO BG -->
-<video id="bgVideo" src="./assets/video/background.mp4" autoplay muted loop playsinline></video>
+<video id="bgVideo" src="assets/video/background.mp4" autoplay muted loop playsinline></video>
 <div class="overlay"></div>
 
 <!-- APP SHELL -->
@@ -630,7 +630,7 @@
       <div class="avatarWrap">
         <div class="avatarGlow"></div>
         <div class="avatarRing"></div>
-        <img class="logo" src="./assets/img/logo.png" alt="avatar" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')" />
+        <img class="logo" src="assets/img/logo.png" alt="avatar" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')" />
         <img class="avatarDecoration" src="" alt="" />
         <span class="statusDot offline" id="statusDot"></span>
       </div>
@@ -759,7 +759,7 @@ function getRichPresenceImage(input, options = {}) {
       if (app.id == appId) return `https://cdn.discordapp.com/app-icons/${appId}/${app.icon_hash}.${ext}`;
     }
   }
-  return "./assets/img/placeholder.png";
+  return "assets/img/placeholder.png";
 }
 
 function getTimestamp(currentTs, startTs) {

@@ -4,9 +4,9 @@
         
         <title>ImLolloTv</title>
 
-        <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="css/style.css">
 
-        <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
+        <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,12 +15,13 @@
         <script src="https://kit.fontawesome.com/e7582dbc88.js" crossorigin="anonymous"></script>
     </head>
     <body>
-        <video src="./assets/video/background.mp4" autoplay muted loop playsinline disablePictureInPicture loading="lazy"></video>
+        <!-- <video src="assets/video/background.mp4" autoplay muted loop playsinline disablePictureInPicture loading="lazy"></video> -->
+        <div id="liquidEther" style="position: absolute; width: 100%; height: 100%;"></div>
 
         <div class="sectionContainer">
             <section class="main">
                 <main style="z-index: 1;">
-                    <img class="logo" src="./assets/img/logo.png" loading="lazy">
+                    <img class="logo" src="assets/img/logo.png" loading="lazy">
                     <img class="avatarDecoration" src="" loading="lazy">
 
                     <h1>Lollo</h1>
@@ -85,7 +86,15 @@
             <a href="https://imlollotv.github.io/claude/">🤖</a>
         </div>
 
+        <!-- JavaScript -->
+
         <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.20/fetch.min.js" integrity="sha512-5vzl35V/cPSXliPbZtxHY0Q6cfYFd2Qld79+d7wLPbOxnKeCHH/LmlMD8aYl0ZN5VZPFM2FnKiAjoNJ2k3vrEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="./script.js"></script>
+
+        <script src="js/clickspark.js"></script>
+
+        <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+        <script src="js/liquid-ether.js"></script>
+
+        <script src="js/script.js"></script>
     </body>
 </html>
