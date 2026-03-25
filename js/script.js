@@ -236,16 +236,40 @@ window.onload = async function() {
         // document.body.style.background = "#100000";
         document.body.style.background = "#060010";
 
-        new LiquidEther(document.getElementById("liquidEther"), {
+        function getLiquidSettings() {
+            const width = window.innerWidth;
+            const cores = navigator.hardwareConcurrency || 4;
+
+            if (width <= 480) {
+                return {
+                    resolution: 0.25,
+                    iterationsPoisson: 10,
+                    iterationsViscous: 10
+                };
+            }
+
+            if (width <= 768 || cores <= 4) {
+                return {
+                    resolution: 0.35,
+                    iterationsPoisson: 16,
+                    iterationsViscous: 16
+                };
+            }
+
+            return {
+                resolution: 0.4,
+                iterationsPoisson: 32,
+                iterationsViscous: 32
+            };
+        }
+
+        const ether = new LiquidEther(document.getElementById("liquidEther"), {
             mouseForce: 20,
             cursorSize: 100,
             isViscous: true,
             viscous: 30,
-            iterationsViscous: 32,
-            iterationsPoisson: 32,
             dt: 0.014,
             BFECC: true,
-            resolution: 0.5,
             isBounce: true,
             // colors: ["#ff2929","#ff615c","#f19993"],
             colors: ["#8929ff","#be5cff","#e193f1"],
@@ -254,7 +278,13 @@ window.onload = async function() {
             autoIntensity: 2.2,
             takeoverDuration: 0.25,
             autoResumeDelay: 1000,
-            autoRampDuration: 0.6
+            autoRampDuration: 0.6,
+
+            ...getLiquidSettings()
+        });
+
+        window.addEventListener("resize", () => {
+            ether.updateOptions(getLiquidSettings());
         });
     };
 
