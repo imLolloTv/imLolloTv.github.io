@@ -220,7 +220,7 @@ function userActivity(userActivities, spotifyData) {
 }
 
 window.onload = async function() {
-    if (ClickSpark) {
+    if (typeof ClickSpark !== "undefined") {
         new ClickSpark(document.body, {
             sparkColor: '#fff',
             sparkSize: 10,
@@ -232,7 +232,7 @@ window.onload = async function() {
         });
     };
 
-    if (LiquidEther) {
+    if (typeof LiquidEther !== "undefined") {
         // document.body.style.background = "#100000";
         document.body.style.background = "#060010";
 
@@ -287,6 +287,20 @@ window.onload = async function() {
             ether.updateOptions(getLiquidSettings());
         });
     };
+
+    if (typeof VanillaTilt !== "undefined") {
+        VanillaTilt.init(document.querySelectorAll("section > main"), {
+            reverse:                true,
+            max:                    10,
+            scale:                  1.05,
+            speed:                  1000,
+            gyroscope:              true,
+            gyroscopeMinAngleX:     -45,
+            gyroscopeMaxAngleX:     45,
+            gyroscopeMinAngleY:     -45,
+            gyroscopeMaxAngleY:     45,
+        });
+    }
 
     document.querySelectorAll(".nav").forEach((element) => {
         element.classList.add("disabled");
@@ -524,6 +538,10 @@ window.onload = async function() {
             };
         };
     });
+
+    document.addEventListener("wheel", (event) => {
+        document.querySelector(`.${currentSection} .${event.deltaY > 0 ? "navRight" : "navLeft"}`)?.onclick();
+    })
 
     document.addEventListener('touchstart', handleTouchStart, false);        
     document.addEventListener('touchmove', handleTouchMove, false);
