@@ -23,4 +23,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: tuo-username/docker-image:latest
+          tags: imLolloTv/pagesWebsite:latest
