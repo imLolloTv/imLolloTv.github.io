@@ -24,4 +24,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: imlollotv/pageswebsite:latest
+          tags: nloreee/pageswebsite:latest
