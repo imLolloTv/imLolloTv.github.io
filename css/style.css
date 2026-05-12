@@ -25,11 +25,14 @@ body {
           -ms-user-select: none; /* Internet Explorer/Edge */
               user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
               
-    background: url("../assets/img/static-background.png");
+    /* background: url("../assets/img/static-background.png");
     background-repeat: no-repeat;
     background-size: cover;
-    background-position: center;
+    background-position: center; */
     
+    /* Colore liquid ether */
+    background-color: #060010;
+
     width: 100vw;
     height: 100vh;
 }
