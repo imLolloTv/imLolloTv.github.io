@@ -1,0 +1,14 @@
+services:
+  pageswebsite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pageswebsite
+    restart: always
+    networks:
+      - pangolin
+      
+networks:
+  pangolin:
+    driver: bridge
+    external: true
