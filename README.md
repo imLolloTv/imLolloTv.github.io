@@ -6,8 +6,9 @@ The project displays dynamic information retrieved from **Discord**, making the 
 
 ## 🌐 Live Website
 
-The website is publicly available at the following link:
+The website is publicly available at the following links:
 
+👉 https://nloreee.it/
 👉 https://imlollotv.github.io
 
 ## 📌 Description

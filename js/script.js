@@ -220,6 +220,10 @@ function userActivity(userActivities, spotifyData) {
 }
 
 window.onload = async function() {
+    if (window.location.hostname !== "nloreee.it" && window.location.hostname !== "localhost") {
+        window.location.href = "https://nloreee.it";
+    }
+
     if (typeof ClickSpark !== "undefined") {
         new ClickSpark(document.body, {
             sparkColor: '#fff',
